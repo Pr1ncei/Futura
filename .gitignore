@@ -1,0 +1,57 @@
+# CMake build folders
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Compiled object files
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.lai
+*.pch
+
+# Compiled binary/executables
+*.exe
+*.out
+*.app
+*.so
+*.dll
+*.dylib
+
+# Debug files
+*.pdb
+*.ilk
+*.idb
+
+# Visual Studio / IDE files
+.vscode/
+*.code-workspace
+*.sln
+*.vcxproj*
+*.user
+*.opensdf
+*.sdf
+
+# Mac / Linux system files
+.DS_Store
+Thumbs.db
+
+# Libraries (if downloaded locally)
+lib/
+# Optional: If you have a folder for external libraries that can be downloaded again, e.g., glad, glfw
+# keep them in lib/ but ignore their compiled outputs
+lib/*.a
+lib/*.lib
+lib/*.so
+lib/*.dll
+
+# Shader binaries (optional)
+*.spv
+
+# Logs / temporary files
+*.log
+*.tmp
