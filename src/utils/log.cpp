@@ -1,10 +1,15 @@
-/*
-    This logs all of the possible errors and issues in the program and show its source, type, and severity, making debugging way easier.
-    It uses the OpenGL's Debugging tool
-
-    Author: Prince Pamintuan
-    Date: December 08, 2025 (6:02PM)
-*/
+/**
+ *  @file log.cpp
+ * 
+ *  Implements the OpenGL utilities declared in log.h
+ * 
+ *  This file defines the callback that processes OpenGL debug messages
+ *  the function that enables OpenGL's debug reporting features
+ * 
+ *      @author:                Prince Pamintuan
+ *      @date:                  December 08, 2025 (6:02PM)
+ *      Last Modified on:       December 09, 2025 (12:52PM)
+ */
 
 #include "log.h"
 #include <iostream>
@@ -17,6 +22,15 @@
                                        const char* message, 
                                        const void* userParam)
     {
+        /**  
+         * Filter noise and irrelevant debug messages.
+         * 
+         *      ID:         Description:
+         *      131169 -    Buffer usage info (driver notification)        
+         *      131185 -    Redundant state change
+         *      131218 -    Shader/program recompiled by driver
+         *      131204 -    General performance warning or driver notifcation
+        */
         if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
         if (type == GL_DEBUG_TYPE_PERFORMANCE) return;
 
@@ -62,5 +76,4 @@
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(glDebugOutput, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-	    glDebugMessageCallback(0, nullptr);
     }

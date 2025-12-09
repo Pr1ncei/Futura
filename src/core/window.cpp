@@ -7,8 +7,6 @@
 */
 
 #include "window.h"
-#include "../graphics/shader.h"
-
 
 bool Window::Initialize()
 {   

@@ -1,14 +1,17 @@
-/*
-    Manages the Rendering Pipeline for the whole program
-    
-    Glossary:
-        VAO - Vertex Array Object
-        VBO - Vertex Buffer Object
-        EBO - Element Buffer Object
-
-    Author: Prince Pamintuan
-    Date: December 09, 2025 (12:05AM)
-*/
+/**
+ *  @file renderer.cpp
+ * 
+ *  @brief Implements the Renderer class responsible for managing vertex and index buffers,
+ *        setting up vertex array objects (VAO), and drawing models using OpenGL.
+ * 
+ *  The Renderer class encapsulates the creation and management of OpenGL buffer objects
+ *  and provides a simple interface for binding, linking vertex attributes, drawing, and
+ *  disposing resources.
+ * 
+ *      @author:                Prince Pamintuan
+ *      @date:                  December 09, 2025 (12:05AM)
+ *      Last Modified on:       December 09, 2025 (2:11PM)
+ */
 
 #include "renderer.h"
 #include <iostream>
