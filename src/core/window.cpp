@@ -25,7 +25,7 @@ bool Window::Initialize()
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
 
-    m_window = glfwCreateWindow(800, 600, "BUKAS", NULL, NULL);
+    m_window = glfwCreateWindow(800, 600, "Futura", NULL, NULL);
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, FramebufferSizeCallback);
 

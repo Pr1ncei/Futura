@@ -60,9 +60,9 @@ void Renderer::BindBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-    LinkVertexAttr();
+    Renderer::LinkVertexAttr();
 
-    glBindVertexArray(0);
+    // glBindVertexArray(0);
 }
 
 /**
@@ -72,25 +72,25 @@ void Renderer::BindBuffers()
  * The current function assumes 8 floats per vertex:
  *      position                = 3
  *      colors                  = 3
- *      texture coordinates     = 2     (REMOVED FOR NOW, TESTING PURPOSES ONLY)
+ *      texture coordinates     = 2     
  */
 void Renderer::LinkVertexAttr()
 {
     glBindVertexArray(VAO);
 
     // Vertex Array Object
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // Vertex Buffer Object
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     // Element Buffer Object
-    // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    // glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 /**
