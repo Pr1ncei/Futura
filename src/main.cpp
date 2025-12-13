@@ -17,7 +17,7 @@
      *  
      *      @author:             Prince Pamintuan
      *      @date:               December 07, 2025 (10:21PM)
-     *      Last Modified on:    December 10, 2025 (2:26PM)
+     *      Last Modified on:    December 13, 2025 (10:26PM)
      */
 
     #include <iostream>
@@ -47,11 +47,7 @@
 
         Shader containerShader("../src/graphics/shaders/Container.vs", "../src/graphics/shaders/Container.fs");
 
-        Renderer renderer(
-            Models::vertices.data(), Models::vertices.size(),
-            Models::indices.data(), Models::indices.size()
-        );
-
+        Renderer renderer(Models::vertices, 5);
         /*
             TESTING PURPOSES ONLY, I HAVEN'T IMPLEMENTED A MANAGER FOR THIS -<-
             I'll be testing if the texture feature works
@@ -67,9 +63,16 @@
         );
         
         containerShader.Use();
-        glUniform1i(glGetUniformLocation(containerShader.ID, "texture"), 0);
 
         containerShader.setInt("texture", 0);
+
+        glm::mat4 projection = glm::perspective(
+            glm::radians(45.0f),
+            800.0f / 600.0f,
+            0.0f,
+            100.0f
+        );
+        containerShader.setMat4("projection", projection);
 
         std::vector<GLuint> textures = {
             texture.GetID()
@@ -79,12 +82,31 @@
         { 
             input.Process(window.getWindow());
             glClearColor(0.1f, 0.5f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             texture.Use(textures);
-            
             containerShader.Use();
-            renderer.Draw();
+
+
+            // TODO: Add a manager to handle this instead putting this on the main file
+            glm::mat4 view = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3(0.0f, 0.0f, -3.0f)
+            );
+            containerShader.setMat4("view", view);
+
+            float angle = static_cast<float>(glfwGetTime());
+
+            for (unsigned int i = 0; i < 10; i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, Models::cubePositions[i]);
+                model = glm::rotate(model, angle + i, glm::vec3(1.0f, 0.3f, 0.5f));
+
+                containerShader.setMat4("model", model);
+                renderer.Draw();
+            }
+
 
             window.Update();
         }

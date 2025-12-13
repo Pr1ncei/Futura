@@ -3,11 +3,18 @@
 
 #include <vector>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 namespace Models
 {
     extern std::vector<GLfloat> vertices;
-    extern std::vector<GLuint> indices;
+    extern glm::vec3 cubePositions[];
+
+    void Transform();
+
 }
 
 

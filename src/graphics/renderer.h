@@ -10,7 +10,7 @@
  * 
  *      @author:                Prince Pamintuan
  *      @date:                  December 09, 2025 (12:05AM)
- *      Last Modified on:       December 09, 2025 (1:52PM)
+ *      Last Modified on:       December 13, 2025 (10:07PM)
  */
 
 #ifndef RENDERER_H
@@ -30,14 +30,15 @@ class Renderer
 {
 private:
     // Vertex Data (acts like a points) stored as floats
-    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> m_vertices;
     
     // Index Data used for indexed drawing instead of manually drawing with vertex data
-    std::vector<GLuint> indices;
+    std::vector<GLuint> m_indices;
     
     // Number of vertices and indices
     size_t m_vertexCount, m_indexCount;
-    
+    GLsizei m_stride;
+
     /**
      *  Vertex Array Object (VAO) - Container for Vertex Attribute State    
      *      1. Which VBOs are bound
@@ -56,17 +57,28 @@ private:
 
 public: 
     /**
-     * @brief Constructs a Renderer object and initializes vertex and index data.
-     *
-     * This constructor copies the provided vertex and index arrays into internal
-     * vectors and sets up the counts for later buffer allocation.
-     *
-     * @param vertexData Pointer to the array of vertex data.
-     * @param vertexCount Number of vertices in the vertexData array.
-     * @param indexData Pointer to the array of index data.
-     * @param indexCount Number of indices in the indexData array.
+     * Constructs a Renderer for indexed geometry.
+     * 
+     * @param vertexData   Pointer to an array of vertex attribute data
+     * @param vertexCount  Total number of floats in the vertex array
+     * @param indexData    Pointer to an array of index data
+     * @param indexCount   Number of indices in the index array
+     * @param stride       Number of floats per vertex
      */
-    Renderer(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount);
+    Renderer(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount, GLsizei stride);
+
+    /**
+     * Constructs a Renderer for non-indexed geometry.
+     * 
+     * This constructor is intended for meshes that do not use an
+     * element buffer object (EBO). Rendering will be performed using
+     * glDrawArrays.
+     * 
+     * @param vertices  Vector containing interleaved vertex attribute data
+     * @param stride    Number of floats per vertex
+     */
+    Renderer(const std::vector<GLfloat>& vertices, GLsizei stride);
+
 
     /**
      * @brief Binds the VAO, VBO, and EBO and uploads vertex/index data to the GPU.
