@@ -19,6 +19,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "input.h"
 
 /**
  * @brief Encapsulates a GLFW window and provides methods for window management.

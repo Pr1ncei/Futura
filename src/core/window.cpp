@@ -28,6 +28,15 @@ bool Window::Initialize()
     m_window = glfwCreateWindow(800, 600, "Futura", NULL, NULL);
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, FramebufferSizeCallback);
+    glfwSetCursorPosCallback(m_window, Input::MouseCallback);
+    glfwSetScrollCallback(m_window, Input::ScrollCallback);
+
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (glfwRawMouseMotionSupported())
+    {
+        glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    }
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -35,6 +44,7 @@ bool Window::Initialize()
         glfwTerminate();
         return false;
     }
+
 
     glClearColor(0.25f, 0.15f, 0.75f, 1.0f);
     return true;

@@ -17,7 +17,7 @@
      *  
      *      @author:             Prince Pamintuan
      *      @date:               December 07, 2025 (10:21PM)
-     *      Last Modified on:    December 13, 2025 (10:26PM)
+     *      Last Modified on:    December 14, 2025 (6:49PM)
      */
 
     #include <iostream>
@@ -31,26 +31,40 @@
     #include "graphics/shader.h"
     #include "graphics/texture.h"
     #include "utils/log.h"
+    #include "core/window_context.h"
+
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    float deltaTime = 0.0f; 
+    float lastFrame = 0.0f; 
 
     int main(int, char**)
     {   
         Window window;
         Input input; 
-
         if (!window.Initialize())
         {
             return -1; 
         }
+        
+        WindowContext context; 
+        context.camera = &camera; 
+        context.input = &input; 
+
+        glfwSetWindowUserPointer(window.getWindow(), &context);
+
+
+        glEnable(GL_DEPTH_TEST);
 
         // Enable OpenGL debugging/logging, uncomment this if you want to disable OpenGL's debugging feature
         BUKAS::Log::enableReportGlErrors();
+
 
         Shader containerShader("../src/graphics/shaders/Container.vs", "../src/graphics/shaders/Container.fs");
 
         Renderer renderer(Models::vertices, 5);
         /*
             TESTING PURPOSES ONLY, I HAVEN'T IMPLEMENTED A MANAGER FOR THIS -<-
-            I'll be testing if the texture feature works
+            I'll be testing if the camera and texture still works 
         */
 
         Texture texture; 
@@ -66,47 +80,46 @@
 
         containerShader.setInt("texture", 0);
 
-        glm::mat4 projection = glm::perspective(
-            glm::radians(45.0f),
-            800.0f / 600.0f,
-            0.0f,
-            100.0f
-        );
-        containerShader.setMat4("projection", projection);
-
         std::vector<GLuint> textures = {
             texture.GetID()
         };
 
         while (!window.ShouldClose())
         { 
-            input.Process(window.getWindow());
+            float currentFrame = static_cast<float>(glfwGetTime());
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
+
+            input.Process(window.getWindow(), camera, deltaTime);
             glClearColor(0.1f, 0.5f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             texture.Use(textures);
             containerShader.Use();
 
-
             // TODO: Add a manager to handle this instead putting this on the main file
-            glm::mat4 view = glm::translate(
-                glm::mat4(1.0f),
-                glm::vec3(0.0f, 0.0f, -3.0f)
+   
+            glm::mat4 projection = glm::perspective(
+                glm::radians(camera.Zoom),
+                800.0f / 600.0f,
+                0.1f, 
+                100.0f
             );
-            containerShader.setMat4("view", view);
+            containerShader.setMat4("projection", projection);
 
-            float angle = static_cast<float>(glfwGetTime());
+            glm::mat4 view = camera.GetViewMatrix();
+            containerShader.setMat4("view", view);
 
             for (unsigned int i = 0; i < 10; i++)
             {
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, Models::cubePositions[i]);
-                model = glm::rotate(model, angle + i, glm::vec3(1.0f, 0.3f, 0.5f));
-
+                float angle = static_cast<float>(glfwGetTime()) * 25.0f * i; 
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
                 containerShader.setMat4("model", model);
                 renderer.Draw();
             }
-
 
             window.Update();
         }
