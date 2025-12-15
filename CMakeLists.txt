@@ -8,6 +8,7 @@ find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE SOURCES
     src/*.cpp
     lib/*.c
+    assets/*.cpp   
 )
 
 # Create the executable

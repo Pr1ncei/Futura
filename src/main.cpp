@@ -17,22 +17,22 @@
      *  
      *      @author:             Prince Pamintuan
      *      @date:               December 07, 2025 (10:21PM)
-     *      Last Modified on:    December 14, 2025 (6:49PM)
+     *      Last Modified on:    December 15, 2025 (8:42AM)
      */
 
     #include <iostream>
     #include <vector>
     #include "glad/glad.h"
     #include <GLFW/glfw3.h>
-    #include "core/window.h"
-    #include "core/input.h"
-    #include "graphics/renderer.h"
-    #include "graphics/models/Container.h"
-    #include "graphics/shader.h"
-    #include "graphics/texture.h"
-    #include "utils/log.h"
-    #include "core/window_context.h"
-
+    #include "core/c_window.h"
+    #include "core/c_input.h"
+    #include "graphics/g_renderer.h"
+    #include "../assets/models/Container.h"
+    #include "../assets/models/Plane.h"
+    #include "graphics/g_shader.h"
+    #include "graphics/g_texture.h"
+    #include "utils/u_log.h"
+    
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     float deltaTime = 0.0f; 
     float lastFrame = 0.0f; 
@@ -41,48 +41,54 @@
     {   
         Window window;
         Input input; 
-        if (!window.Initialize())
+        if (!window.Initialize(&camera, &input))
         {
             return -1; 
         }
         
-        WindowContext context; 
-        context.camera = &camera; 
-        context.input = &input; 
-
-        glfwSetWindowUserPointer(window.getWindow(), &context);
-
-
         glEnable(GL_DEPTH_TEST);
 
         // Enable OpenGL debugging/logging, uncomment this if you want to disable OpenGL's debugging feature
         BUKAS::Log::enableReportGlErrors();
 
 
-        Shader containerShader("../src/graphics/shaders/Container.vs", "../src/graphics/shaders/Container.fs");
-
+        Shader containerShader("../assets/shaders/Container.vs", "../assets/shaders/Container.fs");
         Renderer renderer(Models::vertices, 5);
+ 
+        Renderer planeRenderer(Models::planeVertices, Models::planeVertexCount, 5);
+ 
         /*
             TESTING PURPOSES ONLY, I HAVEN'T IMPLEMENTED A MANAGER FOR THIS -<-
             I'll be testing if the camera and texture still works 
         */
 
+        
         Texture texture; 
         texture.Add(
             Texture::Dimensions::D2,
             Texture::Wrap::Repeat,
             Texture::Mipmap::LinearLinear,
             true, 
-            "../src/graphics/texture/gate.jpg"
+            "../assets/texture/gate.jpg"
         );
         
-        containerShader.Use();
+        Texture groundTexture; 
+        groundTexture.Add(
+            Texture::Dimensions::D2,
+            Texture::Wrap::Repeat, 
+            Texture::Mipmap::LinearLinear,
+            true, 
+            "../assets/texture/grass.jpg"
+        );
 
+        containerShader.Use();
         containerShader.setInt("texture", 0);
 
         std::vector<GLuint> textures = {
             texture.GetID()
         };
+
+        std::vector<GLuint> groundTextures = { groundTexture.GetID() };
 
         while (!window.ShouldClose())
         { 
@@ -92,9 +98,10 @@
 
 
             input.Process(window.getWindow(), camera, deltaTime);
-            glClearColor(0.1f, 0.5f, 0.3f, 1.0f);
+            glClearColor(0.58f, 0.925f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            
             texture.Use(textures);
             containerShader.Use();
 
@@ -111,7 +118,7 @@
             glm::mat4 view = camera.GetViewMatrix();
             containerShader.setMat4("view", view);
 
-            for (unsigned int i = 0; i < 10; i++)
+            for (unsigned int i = 0; i < 2; i++)
             {
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, Models::cubePositions[i]);
@@ -120,10 +127,15 @@
                 containerShader.setMat4("model", model);
                 renderer.Draw();
             }
+            groundTexture.Use(groundTextures);
+            glm::mat4 groundModel = glm::mat4(1.0f); // The Identity Matrix
+            containerShader.setMat4("model", groundModel);
+            planeRenderer.Draw();
 
             window.Update();
         }
         renderer.Dispose();
+        planeRenderer.Dispose();
         window.Terminate();
 
         return 0; 
