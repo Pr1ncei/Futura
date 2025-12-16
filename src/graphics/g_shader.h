@@ -1,5 +1,5 @@
 /**
- *  @file shader.h
+ *  @file g_shader.h
  * 
  *  @brief Defines the Shader class used for compiling, linking, and 
  *        managing OpenGL shader programs

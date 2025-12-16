@@ -26,7 +26,7 @@
     #include <GLFW/glfw3.h>
     #include "core/c_window.h"
     #include "core/c_input.h"
-    #include "graphics/g_renderer.h"
+    #include "graphics/g_mesh.h"
     #include "../assets/models/Container.h"
     #include "../assets/models/Plane.h"
     #include "graphics/g_shader.h"
@@ -53,9 +53,9 @@
 
 
         Shader containerShader("../assets/shaders/Container.vs", "../assets/shaders/Container.fs");
-        Renderer renderer(Models::vertices, 5);
+        Mesh renderer(Models::vertices, 5);
  
-        Renderer planeRenderer(Models::planeVertices, Models::planeVertexCount, 5);
+        Mesh planeRenderer(Models::planeVertices, Models::planeVertexCount, 5);
  
         /*
             TESTING PURPOSES ONLY, I HAVEN'T IMPLEMENTED A MANAGER FOR THIS -<-

@@ -139,7 +139,7 @@ public:
      * 
      *  @param textures - A list of OpenGL texture IDs to bind.
      */
-    void Use(const std::vector<GLuint>& textures);
+    static void Use(const std::vector<GLuint>& textures);
 
 };
 

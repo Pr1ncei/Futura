@@ -26,7 +26,7 @@
  *  This class stores vertex and index data internally, manages OpenGL buffers (VAO, VBO, EBO),
  *  and provides functions for drawing and cleanup.
  */
-class Renderer  
+class Mesh 
 {
 private:
     // Vertex Data (acts like a points) stored as floats
@@ -65,9 +65,9 @@ public:
      * @param indexCount   Number of indices in the index array
      * @param stride       Number of floats per vertex
      */
-    Renderer(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount, GLsizei stride);
+    Mesh(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount, GLsizei stride);
 
-    Renderer(GLfloat* vertexData, size_t vertexCount, GLsizei stride);
+    Mesh(GLfloat* vertexData, size_t vertexCount, GLsizei stride);
 
 
     /**
@@ -80,7 +80,7 @@ public:
      * @param vertices  Vector containing interleaved vertex attribute data
      * @param stride    Number of floats per vertex
      */
-    Renderer(const std::vector<GLfloat>& vertices, GLsizei stride);
+    Mesh(const std::vector<GLfloat>& vertices, GLsizei stride);
 
 
     /**

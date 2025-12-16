@@ -118,4 +118,5 @@ void Texture::Use(const std::vector<GLuint>& textures)
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures[i]);
     }
+    
 }

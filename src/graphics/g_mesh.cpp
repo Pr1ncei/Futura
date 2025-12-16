@@ -1,5 +1,5 @@
 /**
- *  @file renderer.cpp
+ *  @file g_mesh.cpp
  * 
  *  @brief Implements the Renderer class responsible for managing OpenGL
  *         vertex array objects (VAO), vertex buffers (VBO), optional index
@@ -21,7 +21,7 @@
  *              and NOT the handling the geometry side of the mesh.
  */
 
-#include "g_renderer.h"
+#include "g_mesh.h"
 #include <iostream>
 
 /**
@@ -37,7 +37,7 @@
  * @param indexCount   Number of indices in the index array
  * @param stride       Number of floats per vertex
  */
-Renderer::Renderer(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount, GLsizei stride) : m_stride(stride), m_indexCount(indexCount)
+Mesh::Mesh(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, size_t indexCount, GLsizei stride) : m_stride(stride), m_indexCount(indexCount)
 {
     m_vertexCount = vertexCount;
     m_indexCount = indexCount;
@@ -51,7 +51,7 @@ Renderer::Renderer(GLfloat* vertexData, size_t vertexCount, GLuint* indexData, s
     BindBuffers();
 }
 
-Renderer::Renderer(GLfloat* vertexData, size_t vertexCount, GLsizei stride) 
+Mesh::Mesh(GLfloat* vertexData, size_t vertexCount, GLsizei stride) 
     : m_stride(stride), 
       m_indexCount(0), // <-- Critical: Must initialize index count to 0
       m_vertexCount(vertexCount / stride) // Calculate vertex count
@@ -74,7 +74,7 @@ Renderer::Renderer(GLfloat* vertexData, size_t vertexCount, GLsizei stride)
  * @param vertices  Vector containing interleaved vertex attribute data
  * @param stride    Number of floats per vertex
  */
-Renderer::Renderer(const std::vector<GLfloat>& vertices, GLsizei stride) : m_vertices(vertices), m_stride(stride), m_indexCount(0)
+Mesh::Mesh(const std::vector<GLfloat>& vertices, GLsizei stride) : m_vertices(vertices), m_stride(stride), m_indexCount(0)
 {
     m_vertexCount = vertices.size() / stride;
     VAO = VBO = EBO = 0; 
@@ -93,7 +93,7 @@ Renderer::Renderer(const std::vector<GLfloat>& vertices, GLsizei stride) : m_ver
  * Vertex and index data are uploaded to the GPU, and vertex
  * attribute pointers are configured.
  */
-void Renderer::BindBuffers()
+void Mesh::BindBuffers()
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -111,7 +111,7 @@ void Renderer::BindBuffers()
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(GLuint), m_indices.data(), GL_STATIC_DRAW);
     }
 
-    Renderer::LinkVertexAttr();
+    Mesh::LinkVertexAttr();
     glBindVertexArray(0);
 }
 
@@ -125,7 +125,7 @@ void Renderer::BindBuffers()
  * 
  *  Total floats per vertex: 5  
  */
-void Renderer::LinkVertexAttr()
+void Mesh::LinkVertexAttr()
 {
     glBindVertexArray(VAO);
 
@@ -147,7 +147,7 @@ void Renderer::LinkVertexAttr()
 /**
  * Deletes OpenGL buffers and releases GPU resources.
  */
-void Renderer::Dispose()
+void Mesh::Dispose()
 {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
@@ -163,7 +163,7 @@ void Renderer::Dispose()
  * The appropriate draw method is selected automatically
  * based on the presence of an element buffer.
  */
-void Renderer::Draw()
+void Mesh::Draw()
 {
     glBindVertexArray(VAO);
     

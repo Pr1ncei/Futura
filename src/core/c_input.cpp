@@ -27,8 +27,7 @@ void Input::Process(GLFWwindow* window, Camera& camera, float deltaTime)
         ProcessKeyboard(camera, RIGHT, deltaTime);
 
 }
-
-// This is clunky 
+ 
 void Input::ProcessKeyboard(Camera &camera, Camera_Movement direction, float deltaTime)
 {
     float velocity = camera.MovementSpeed * deltaTime; 
@@ -41,7 +40,6 @@ void Input::ProcessKeyboard(Camera &camera, Camera_Movement direction, float del
     if (direction == RIGHT)
         camera.Position += camera.Right * velocity;
     camera.Position.y = 0.0f;   // This is good to set a true fps camera
-
 }
 
 void Input::ProcessMouseMovement(Camera &camera, GLfloat xoffset, GLfloat yoffset)
