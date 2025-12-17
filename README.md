@@ -1,14 +1,37 @@
-Greetings, this is an initial README file about the project, will revise this in the future.
-For now, this is my current tech stack that I plan for this project:
+# Futura
+Futura is a work-in-progress multiplayer FPS written in C++ using OpenGL.
+The goal of this project is to build a classic-style FPS engine inspired by games like Quake, Half-Life, and CS 1.6, while keeping the codebase clean, understandable, and fun to work on.
 
-Tech Stack:
------------
-1. **GLFW** - For creating windows and handling keyboard/mouse input.
-2. **GLAD** - OpenGL function loader to access modern OpenGL features.
-3. **GLM** - Mathematics library for vectors, matrices, and transformations.
-4. **SDL2 (Audio subsystem)** - For handling audio playback (sound effects and music).
-5. **stb_image** - Simple image loader for textures (PNG, JPG, etc.).
-6. **Dear ImGui** - For debugging UI and development tools.
-7. **Assimp / tinyobjloader** - For importing 3D models (OBJ/FBX support planned).
-8. **Bullet Physics (optional)** - For collision detection and physics simulation.
-9. **CMake** - Cross-platform build system.
+This is very much an active development project. Things will break, change, and get refactored as the engine evolves.
+
+## Project Status
+- Core rendering and FPS controls are already working
+- Engine architecture and managers are currently being built
+- BSP-based world rendering and collision are planned next
+
+If you’re browsing the repo, expect unfinished systems, dirty code, and poorly-made decisions of a game since I do not know what am I doing.
+
+## Roadmap: (6-12 Months Development Time)
+Phase 1: Rendering Pipiline + FPS Controls **(DONE)**
+
+Phase 2: Managers & Renderer Abstraction **(ONGOING)**
+
+Phase 3: BSP World System (Rendering + Collision + PVS)
+
+Phase 4: Entity System (GoldSrc-style)
+
+Phase 5: FPS Gameplay (Weapons, Health, Rules)
+
+Phase 6: Multiplayer Architecture (Client/Server)
+
+Phase 7: Multiplayer Gameplay
+
+Phase 8: Optimization & Polish
+
+The roadmap is flexible and may change as development continues.
+
+### Notes
+This project is mainly for learning, experimentation, and long-term development.
+If you’re interested in classic FPS engine design, BSP worlds, or low-level C++ game architecture, feel free to explore the code or follow along.
+
+Contributions, suggestions, and discussions are welcome once the foundation is more stable.
