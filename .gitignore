@@ -1,9 +1,6 @@
-# CMake build folders
-/build/
-/CMakeFiles/
-/CMakeCache.txt
-cmake_install.cmake
-Makefile
+# Premake build folders
+/bin/
+/bin-int/
 
 # Compiled object files
 *.o
@@ -28,6 +25,7 @@ Makefile
 *.idb
 
 # Visual Studio / IDE files
+.vs/
 .vscode/
 *.code-workspace
 *.sln
