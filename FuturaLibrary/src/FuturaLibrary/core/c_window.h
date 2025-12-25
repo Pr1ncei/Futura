@@ -10,80 +10,51 @@
  * 
  *      @author:                  Prince Pamintuan
  *      @date:                    December 08, 2025 (4:47PM)
- *      Last Modified on:         December 15, 2025 (8:43PM)
+ *      Last Modified on:         December 25, 2025 (11:59PM)
  */
 
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 #include "pch.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include "c_input.h"
-#include "c_window_context.h"
+#include "c_core.h"
+#include "../events/e_Event.h"
 
-/**
- * @brief Encapsulates a GLFW window and provides methods for window management.
- *
- * The Window class abstracts the GLFWwindow pointer and provides functionality for
- * initialization, frame updates, and termination. It also sets a framebuffer size
- * callback to handle window resizing.
- */
-class Window
+namespace FuturaLibrary
 {
-private: 
-    // Pointer to the GLFW window object
-    GLFWwindow* m_window;
+    struct WindowProps
+    {
+        std::string m_Title; 
+        unsigned int m_Width, m_Height; 
+        WindowProps(
+            const std::string title = "Futura", 
+            unsigned int width = 800,
+            unsigned int height = 600
+        ) : m_Title(title), m_Width(width), m_Height(height) { }
+    };
 
-    WindowContext m_context; 
+    class FT_API Window
+    {
+    public: 
+        using EventCallbackFn = std::function<void(Event&)>; 
+        virtual ~Window(); 
+        virtual void OnUpdate() = 0; 
 
-    /**
-     * @brief Callback function called by GLFW when the window is resized.
-     *
-     * Adjusts the OpenGL viewport to match the new window size.
-     *
-     * @param window Pointer to the GLFW window.
-     * @param width  New width of the window.
-     * @param height New height of the window.
-     */
-    static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+        virtual unsigned int GetWidth() const = 0; 
+        virtual unsigned int GetHeight() const = 0; 
 
-public:
-    /**
-     * @brief Returns the underlying GLFW window pointer.
-     * @return Pointer to GLFWwindow.
-     */
-    GLFWwindow* getWindow() const { return m_window; }
-    
-    /**
-     * @brief Initializes GLFW, creates the window, and loads OpenGL function pointers via GLAD.
-     *
-     * This function must be called before any OpenGL rendering or context usage.
-     *
-     * @return True if initialization was successful, false otherwise.
-     */
-    bool Initialize(Camera* camera, Input* input);
+        virtual float GetAspectRatio() const = 0; 
 
-    /**
-     * @brief Checks whether the window should close.
-     *
-     * Typically used in the render loop to determine whether to exit.
-     *
-     * @return True if the window should close, false otherwise.
-     */ 
-    bool ShouldClose();
+        virtual void SetEventCallback(const EventCallbackFn& callback) = 0; 
+        virtual void SetVSync(bool enabled) = 0; 
+        virtual void SetMaximized(bool enabled) = 0; 
+        virtual void SetCursorVisibility() = 0; 
+        virtual void IsVsync() const = 0; 
+        virtual double GetTime() const = 0; 
 
-    /**
-     * @brief Updates the window by polling events and swapping buffers.
-     *
-     * Must be called each frame to process input events and display the rendered frame.
-     */
-    void Update();  
+        virtual void* GetNativeWindow() const = 0; 
 
-    /**
-     * @brief Terminates GLFW and cleans up resources associated with the window.
-     */
-    void Terminate();
-};
+        static Window* Create(const WindowProps& props = WindowProps()); 
 
-#endif
+    };
+
+}

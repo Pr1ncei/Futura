@@ -3,31 +3,28 @@
 #include "c_core.h"
 #include <memory>
 #include "c_window.h"
-#include "c_input.h"
-#include "../graphics/g_shader.h"
-#include "../graphics/g_mesh.h"
-#include "../graphics/g_texture.h"
-#include "../core/c_camera.h"
+#include "../events/e_Event.h"
+#include "../events/e_AppEvent.h"
 
 namespace FuturaLibrary
 {
 	class FT_API Application
 	{
 	public:
-		Application(const std::string& assetRoot);
+		Application();
 		virtual ~Application();
-
 		void Run();
+		void Close(); 
+		void OnEvent(Event& e);
 
-	protected:
-		virtual void OnInit() {}
-		virtual void OnUpdate(float dt) {}
-		virtual void OnShutdown() {}
+		inline Window& GetWindow() { return *m_Window; }
+		static inline Application& Get() { return *s_Instance; }
 
 	private:
+		std::unique_ptr<Window> m_Window;
 		bool m_Running = true; 
-		std::string m_AssetRoot; 
+		static Application* s_Instance; 
 	};
-
-	std::unique_ptr<Application> CreateApplication(const std::string& assetRoot); 
+	// Define in Client -<-
+	Application* CreateApplication(); 
 }
