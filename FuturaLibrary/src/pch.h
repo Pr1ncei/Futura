@@ -17,6 +17,8 @@
 #include <unordered_set>
 #include <regex>
 
+#include "FuturaLibrary/utils/u_Instrumentor.h"
+
 #ifdef FT_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif

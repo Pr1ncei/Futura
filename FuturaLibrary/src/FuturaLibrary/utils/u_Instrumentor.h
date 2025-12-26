@@ -91,10 +91,39 @@ namespace FuturaLibrary
 
 	class InstrumentorTimer
 	{
-		// To be implemented later, imma sleep (12-26-2025, 1:06am) 
+	public: 
+		InstrumentorTimer(const char* name) : m_Name(name), m_Stopped(false)
+		{
+			m_StartTimepoint = std::chrono::high_resolution_clock::now(); 
+		}
+
+		~InstrumentorTimer()
+		{
+			if (!m_Stopped) Stop(); 
+		}
+
+		void Stop()
+		{
+			auto endTimepoint = std::chrono::high_resolution_clock::now(); 
+
+			long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count(); 
+			long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+
+			uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+			Instrumentor::Get().StartProfile({ m_Name, start, end, threadID });
+
+			m_Stopped = true; 
+		}
+
+	private: 
+		const char* m_Name; 
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint; 
+		bool m_Stopped; 
 	};
 }
 #ifdef FT_DEBUG 
+#define ZoneScoped FuturaLibrary::InstrumentorTimer timer##__LINE__(__FUNCTION__);
+#define ZoneScopedN(name) FuturaLibrary::InstrumentorTimer timer##__LINE__(name);
 #define FT_PROFILE_BEGIN_SESSION(name, filepath)
 #define FT_PROFILE_END_SESSION 
 #define FT_PROFILE_SCOPE(name) ZoneScopedN(name)

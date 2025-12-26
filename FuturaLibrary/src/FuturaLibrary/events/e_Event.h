@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "../core/c_core.h"
+#include "FuturaLibrary/core/c_core.h"
 
 namespace FuturaLibrary
 {
