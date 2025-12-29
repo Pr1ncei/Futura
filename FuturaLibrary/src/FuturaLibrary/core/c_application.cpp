@@ -59,6 +59,4 @@ namespace FuturaLibrary
         // resize viewport (placeholder for now since I don't have a decent rendering system yet) 
         return false; 
     }
-
-
 }

@@ -12,7 +12,7 @@
  */
 
 #include "pch.h"
-#include "u_log.h"
+#include "u_GraphicsLog.h"
 
     void GLAPIENTRY BUKAS::Log::glDebugOutput(GLenum source, 
                                        GLenum type, 
