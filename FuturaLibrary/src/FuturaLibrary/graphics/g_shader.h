@@ -1,91 +1,68 @@
 /**
  *  @file g_shader.h
  * 
- *  @brief Defines the Shader class used for compiling, linking, and 
- *        managing OpenGL shader programs
- * 
- *  This class loads vertex and fragment shader source code from files,
- *  compiles them, links them into a shader program, and provides helper
- *  functions to set uniform variables. It encapsulates typical shader
- *  management tasks into a simple interface
- * 
  *      @author:                Prince Pamintuan
  *      @date:                  December 08, 2025 (6:50PM)
- *      Last Modified on:       December 15, 2025 (11:00AM)
+ *      Last Modified on:       December 30, 2025 (5:05PM)
  */
+
+// So many comments bruh, I'll write a documentation once it's up and running 
+// Rewroting most of it since I also need a way that does includes the sources for GLSL 
 
 #ifndef SHADER_H
 #define SHADER_H
 
 #include "pch.h"
-#include <glad/glad.h>
 #include <glm/glm.hpp>
-
-class Shader
+typedef unsigned int GLenum; 
+namespace FuturaLibrary
 {
-public:
-    /**
-     *  @brief OpenGL shader program ID
-     * 
-     *  This value is assigned after successful compilation and linking
-     *  of the vertex and fragment shader stages.
-     */
-    unsigned int ID;
-    
-    /**
-     *  @brief Constructs a Shader program by loading, compiling, and linking shaders.
-     * 
-     *  The constructor reads shader source code from files, compiles the vertex
-     *  and fragment shaders, and links them into an OpenGL shader program.
-     * 
-     *  @param vertexPath - Path to the vertex shader source file
-     *  @param fragmentPath - Path to the fragment shader source file
-     */
-    Shader(const char* vertexPath, const char* fragmentPath);
+    class Shader
+    {
+    public:
+        Shader(const std::string& filePath, const std::string& globalIncludeSource); 
+        ~Shader(); 
 
-    /**
-     *  @brief Activates (uses) the shader program.
-     * 
-     *  This function calls `glUseProgran(ID)` and makes the shader acts 
-     *  for subsequent draw calls and uniform updates.
-     */
-    void Use();
+        void Bind() const; 
+        void Unbind() const; 
+        const std::string& GetName() const { return m_Name; }
 
-    /**
-     *  @brief Sets a boolean uniform in the shader program.
-     * 
-     *  @param name - Name of the uniform variable in the shader
-     *  @param value - Boolean value to set
-     */
-    void setBool(const std::string &name, bool value) const;
+        // Setting Uniforms 
+        void SetInt(const std::string& name, int value);
+        void SetFloat(const std::string& name, float value); 
+        void SetFloat2(const std::string& name, const glm::vec2& values);
+        void SetFloat3(const std::string& name, const glm::vec3& values);
+        void SetFloat4(const std::string& name, const glm::vec4& values);
+        void SetMat3(const std::string& name, const glm::mat3& values); 
+        void SetMat4(const std::string& name, const glm::mat4& values); 
 
-    /**
-     *  @brief Sets an integer uniform in the shader program.
-     * 
-     *  @param name - Name of the uniform variable in the shader
-     *  @param value - Integer value to set
-     */
-    void setInt(const std::string &name, int value) const; 
-    
-    /**
-     *  @brief Sets a float uniform in the shader program.
-     * 
-     *  @param name - Name of the uniform variable in the shader
-     *  @param value - Floating-point value to set
-     */
-    void setFloat(const std::string &name, float value) const;
+        static Ref<Shader> Create(const std::string& filePath, const std::string& globalIncludeSource); 
+        
+    protected: 
+        std::unordered_map<GLenum, std::string> PreProcess(const std::string& source); 
+        void Compile(const std::unordered_map<GLenum, std::string>& shaderSources); 
 
-    void setVec2(const std::string &name, const glm::vec2 &value) const;
-    void setVec2(const std::string &name, float x, float y) const;
-    void setVec3(const std::string &name, const glm::vec3 &value) const; 
-    void setVec3(const std::string &name, float x, float y, float z) const;
-    void setVec4(const std::string &name, const glm::vec4 &value) const; 
-    void setVec4(const std::string &name, float x, float y, float z, float w) const; 
-    void setMat2(const std::string &name, const glm::mat2 &mat) const; 
-    void setMat3(const std::string &name, const glm::mat3 &mat) const; 
-    void setMat4(const std::string &name, const glm::mat4 &mat) const; 
+        uint32_t m_RendererID; 
+        std::string m_Name; 
+        std::string m_filePath; 
+    };
 
-};
+    class ShaderLibrary
+    {
+    public: 
+        void Add(const Ref<Shader>& shader); 
+        void Add(const std::string& name, const Ref<Shader>& shader); 
+        Ref<Shader> Load(const std::string& source); 
+        void SetGlobalIncludeSource(const std::string& source);
+        void SetGlobalIncludeFile(const std::string& filePath); 
 
+        Ref<Shader> Get(const std::string& name); 
+        bool Exists(const std::string& name) const; 
 
+    private: 
+        std::unordered_map<std::string, Ref<Shader>> m_Shaders; 
+        std::string m_GlobalIncludeSource; 
+        std::string m_GlobalIncludeFileSource;  
+    };
+}
 #endif

@@ -2,8 +2,6 @@
 #define RENDERER_H 
 #include "pch.h"
 
-
-
 namespace FuturaLibrary
 {
 	class Renderer
