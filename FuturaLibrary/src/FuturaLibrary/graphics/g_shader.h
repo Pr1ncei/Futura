@@ -8,13 +8,12 @@
 
 // So many comments bruh, I'll write a documentation once it's up and running 
 // Rewroting most of it since I also need a way that does includes the sources for GLSL 
+#pragma once
 
-#ifndef SHADER_H
-#define SHADER_H
-
-#include "pch.h"
+#include <string>
+#include <unordered_map>
 #include <glm/glm.hpp>
-typedef unsigned int GLenum; 
+typedef unsigned int GLenum;
 namespace FuturaLibrary
 {
     class Shader
@@ -65,4 +64,3 @@ namespace FuturaLibrary
         std::string m_GlobalIncludeFileSource;  
     };
 }
-#endif

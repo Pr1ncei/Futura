@@ -38,6 +38,8 @@ namespace FuturaLibrary
 		FT_CORE_ASSERT(false, "Unknown ShaderDataType"); 
 		return 0; 
 	}
+
+	// Attribute of a vertex in a vertex buffer 
 	struct BufferElement
 	{
 		std::string Name; 
@@ -63,15 +65,111 @@ namespace FuturaLibrary
 			}
 		}
 	};
+	
+	// Full Layout of a Vertex 
+	class BufferLayout
+	{
+	public: 
+		BufferLayout() { }
 
-	// Buffer Layout
-	// Vertex Buffer
-	// Index Buffer
-	// Storage Buffer
+		BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements)
+		{
+			CalculateOffsetAndStride(); 
+		}
 
+		inline const std::vector<BufferElement>& GetElements() const		{ return m_Elements; }
+		inline uint32_t GetStride() const									{ return m_Stride; }
+		std::vector<BufferElement>::iterator begin()						{ return m_Elements.begin(); }
+		std::vector<BufferElement>::iterator end()							{ return m_Elements.end(); }
+		std::vector<BufferElement>::const_iterator begin() const			{ return m_Elements.begin(); }
+		std::vector<BufferElement>::const_iterator end() const				{ return m_Elements.end(); }
+	
+	private: 
+		void CalculateOffsetAndStride()
+		{
+			uint32_t offset = 0; 
+			m_Stride = 0;
+			for (auto& element : m_Elements)
+			{
+				element.Offset = offset; 
+				offset += element.Size; 
+				m_Stride += element.Size; 
+			}
+		}
+		
+		std::vector<BufferElement> m_Elements; 
+		uint32_t m_Stride = 0; 
+	};
 
+	// Wraps an OpenGL VBO and stores vertex data in GPU mem
+	class VertexBuffer
+	{
+	public: 
+		VertexBuffer(float* vertices, uint32_t count); 
+		~VertexBuffer(); 
+		
+		VertexBuffer(const VertexBuffer&) = delete;
+		VertexBuffer& operator=(const VertexBuffer&) = delete;
 
+		VertexBuffer(VertexBuffer&&) noexcept = default; 
+		VertexBuffer& operator=(VertexBuffer&&) noexcept = default; 
+		
+		inline void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
+		inline const BufferLayout& GetLayout() const { return m_Layout; }
+		
+		void Bind() const;
+		static std::unique_ptr<VertexBuffer> Create(float* vertices, uint32_t count); 
 
+	private:
+		uint32_t m_RendererID; 
+		BufferLayout m_Layout; 	
+	};
 
+	// Wraps OpenGL EBO and stores indices for drawing vertices efficiently 
+	class IndexBuffer
+	{
+	public:
+		IndexBuffer(uint32_t* indices, uint32_t count); 
+		~IndexBuffer(); 
+
+		IndexBuffer(const IndexBuffer&) = delete; 
+		IndexBuffer& operator=(const IndexBuffer&) = delete; 
+
+		IndexBuffer(IndexBuffer&&) noexcept = default; 
+		IndexBuffer& operator=(IndexBuffer&&) noexcept = default; 
+
+		uint32_t GetCount() const { return m_Count; }
+
+		void Bind() const;
+		static std::unique_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t size); 
+
+	private: 
+		uint32_t m_RendererID; 
+		uint32_t m_Count; 
+	};
+
+	// Wraps OpenGL SSBO and can store large, arbitrary data accessible in shaders
+	// Quite useful for bsp nodes, lights, and particle data 
+	class StorageBuffer
+	{
+	public:
+		StorageBuffer(uint32_t target, const void* data, uint32_t size, uint32_t flags); 
+		~StorageBuffer(); 
+
+		StorageBuffer(const StorageBuffer&) = delete; 
+		StorageBuffer& operator=(const StorageBuffer&) = delete; 
+
+		StorageBuffer(StorageBuffer&&) noexcept = default; 
+		StorageBuffer& operator=(StorageBuffer&&) noexcept = default; 
+
+		void Bind() const;
+		void BindBufferBase(uint32_t index);
+		void* MapBufferRange(uint32_t offset, uint32_t length, uint32_t access);
+		static Ref<StorageBuffer> Create(uint32_t target, const void* data, uint32_t size, uint32_t flags);
+
+	private: 
+		uint32_t m_RendererID; 
+		uint32_t m_Target; 
+	};
 
 }
