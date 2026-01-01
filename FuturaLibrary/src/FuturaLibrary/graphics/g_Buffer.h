@@ -114,8 +114,9 @@ namespace FuturaLibrary
 		VertexBuffer(VertexBuffer&&) noexcept = default; 
 		VertexBuffer& operator=(VertexBuffer&&) noexcept = default; 
 		
-		inline void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
-		inline const BufferLayout& GetLayout() const { return m_Layout; }
+		inline void SetLayout(const BufferLayout& layout)	{ m_Layout = layout; }
+		uint32_t GetID() const								{ return m_RendererID; }
+		inline const BufferLayout& GetLayout() const		{ return m_Layout; }
 		
 		void Bind() const;
 		static std::unique_ptr<VertexBuffer> Create(float* vertices, uint32_t count); 
@@ -138,7 +139,8 @@ namespace FuturaLibrary
 		IndexBuffer(IndexBuffer&&) noexcept = default; 
 		IndexBuffer& operator=(IndexBuffer&&) noexcept = default; 
 
-		uint32_t GetCount() const { return m_Count; }
+		uint32_t GetCount() const	{ return m_Count; }
+		uint32_t GetID() const		{ return m_RendererID; }
 
 		void Bind() const;
 		static std::unique_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t size); 

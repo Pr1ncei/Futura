@@ -14,20 +14,26 @@ namespace FuturaLibrary
 		VertexArray();
 		~VertexArray();
 
-		void Bind() const; 
-		void Unbind() const; 
+		VertexArray(const VertexArray&) = delete; 
+		VertexArray& operator=(const VertexArray&) = delete; 
 
-		void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer); 
-		void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer); 
+		VertexArray(VertexArray&&) noexcept = default;
+		VertexArray& operator=(VertexArray&&) noexcept = default; 
 
 		inline const std::vector<Ref<VertexBuffer>>& GetVertexBuffer() const	{ return m_VertexBuffer; }
 		inline const Ref<IndexBuffer>& GetIndexBuffer() const					{ return m_IndexBuffer; }
 
-		static VertexArray* Create();
+		void Bind() const; 
+		void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer); 
+		void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer); 
+
+		static std::unique_ptr<VertexArray> Create() { return std::make_unique<VertexArray>(); }
 
 	private: 
-		uint32_t m_RendererID; 
-		std::vector<Ref<VertexBuffer>> m_VertexBuffer; 
+		uint32_t m_RendererID = 0; 
+		uint32_t m_AttribIndex = 0;  // tracks the next available attribute index
+
+		std::vector<Ref<VertexBuffer>> m_VertexBuffers; 
 		Ref<IndexBuffer> m_IndexBuffer; 
 	};
 }
