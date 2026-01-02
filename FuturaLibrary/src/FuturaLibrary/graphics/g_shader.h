@@ -6,8 +6,6 @@
  *      Last Modified on:       December 30, 2025 (5:05PM)
  */
 
-// So many comments bruh, I'll write a documentation once it's up and running 
-// Rewroting most of it since I also need a way that does includes the sources for GLSL 
 #pragma once
 
 #include <string>
@@ -23,7 +21,6 @@ namespace FuturaLibrary
         ~Shader(); 
 
         void Bind() const; 
-        void Unbind() const; 
         const std::string& GetName() const { return m_Name; }
 
         // Setting Uniforms 
@@ -32,8 +29,8 @@ namespace FuturaLibrary
         void SetFloat2(const std::string& name, const glm::vec2& values);
         void SetFloat3(const std::string& name, const glm::vec3& values);
         void SetFloat4(const std::string& name, const glm::vec4& values);
-        void SetMat3(const std::string& name, const glm::mat3& values); 
-        void SetMat4(const std::string& name, const glm::mat4& values); 
+        void SetMat3(const std::string& name, const glm::mat3& matrix); 
+        void SetMat4(const std::string& name, const glm::mat4& matrix); 
 
         static Ref<Shader> Create(const std::string& filePath, const std::string& globalIncludeSource); 
         
