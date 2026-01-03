@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <regex>
 
+#include "FuturaLibrary/utils/u_FileIO.h"
 #include "FuturaLibrary/utils/u_eventlog.h"
 #include "FuturaLibrary/utils/u_Instrumentor.h"
 

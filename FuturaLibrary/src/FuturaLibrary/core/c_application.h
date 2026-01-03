@@ -13,8 +13,12 @@ namespace FuturaLibrary
 	class FT_API Application
 	{
 	public:
-		Application();
+		Application(const std::string& assetRoot);
 		virtual ~Application();
+
+		Application(const Application&) = delete; 
+		Application& operator=(const Application&) = delete; 
+
 		void Run();
 		void Close(); 
 		void OnEvent(Event& e);
@@ -50,5 +54,5 @@ namespace FuturaLibrary
 
 	};
 	// Define in Client -<-
-	Application* CreateApplication(); 
+	Application* CreateApplication(const std::string& assetRoot); 
 }

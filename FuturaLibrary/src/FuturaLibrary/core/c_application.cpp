@@ -11,7 +11,7 @@
 namespace FuturaLibrary
 {
     Application* Application::s_Instance = nullptr; 
-    Application::Application()
+    Application::Application(const std::string& assetRoot)
     { 
         FT_PROFILE_FUNCTION; 
         FT_CORE_ASSERT(!s_Instance, "Application Already Exists!"); 
