@@ -8,7 +8,7 @@ namespace FuturaLibrary
 
 	// Container that groups vertex buffers and optionally adds index buffer into a single object
 	// that the GPU can use for drawing. 
-	class VertexArray
+	class FT_API VertexArray
 	{
 	public:
 		VertexArray();
@@ -20,7 +20,7 @@ namespace FuturaLibrary
 		VertexArray(VertexArray&&) noexcept = default;
 		VertexArray& operator=(VertexArray&&) noexcept = default; 
 
-		inline const std::vector<Ref<VertexBuffer>>& GetVertexBuffer() const	{ return m_VertexBuffer; }
+		inline const std::vector<Ref<VertexBuffer>>& GetVertexBuffer() const	{ return m_VertexBuffers; }
 		inline const Ref<IndexBuffer>& GetIndexBuffer() const					{ return m_IndexBuffer; }
 
 		void Bind() const; 

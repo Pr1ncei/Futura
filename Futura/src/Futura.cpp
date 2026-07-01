@@ -22,11 +22,15 @@
 
 #include "pch.h"
 #include <FuturaLibrary.h>
+#include "GameLayer.h"
 
 class Futura : public FuturaLibrary::Application
 {
 public:
-    Futura(const std::string& assetRoot) : FuturaLibrary::Application(assetRoot) {}
+    Futura(const std::string& assetRoot) : FuturaLibrary::Application(assetRoot)
+    {
+        PushLayer<GameLayer>();
+    }
     ~Futura(){}
 };
 

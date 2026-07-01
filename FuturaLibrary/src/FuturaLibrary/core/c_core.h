@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include <memory>
+#include <type_traits>
 
 #ifdef FT_PLATFORM_WINDOWS
 #ifdef FT_BUILD_DLL
@@ -49,8 +50,7 @@
 
 #define BIT(x) (1 << x)
 
-// I do not know why this isn't working 
-#define FT_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholder::_1)
+#define FT_BIND_EVENT_FN(fn) std::bind(&std::remove_reference_t<decltype(*this)>::fn, this, std::placeholders::_1)
 
 namespace FuturaLibrary
 {

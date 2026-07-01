@@ -13,7 +13,7 @@ namespace FuturaLibrary
 	class FT_API Application
 	{
 	public:
-		Application(const std::string& assetRoot);
+		explicit Application(const std::string& assetRoot = "Futura/assets");
 		virtual ~Application();
 
 		Application(const Application&) = delete; 
@@ -40,11 +40,12 @@ namespace FuturaLibrary
 		{
 			return m_LayerStack.GetLayer<T>();
 		}
-		inline Window& GetWindow() { return *m_Window; }
-		static inline Application& Get() { return *s_Instance; }
+		Window& GetWindow();
+		static Application& Get();
 
 	private:
 		std::unique_ptr<Window> m_Window;
+		std::string m_AssetRoot;
 		bool m_Running = true; 
 		static Application* s_Instance; 
 		LayerStack m_LayerStack; 
@@ -54,5 +55,5 @@ namespace FuturaLibrary
 
 	};
 	// Define in Client -<-
-	Application* CreateApplication(const std::string& assetRoot); 
+	std::unique_ptr<Application> CreateApplication(const std::string& assetRoot = "Futura/assets");
 }

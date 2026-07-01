@@ -2,10 +2,12 @@
 
 #include "pch.h"
 #include "FuturaLibrary/core/c_core.h"
+#include "FuturaLibrary/utils/u_Instrumentor.h"
+#include "FuturaLibrary/utils/u_eventlog.h"
 
 namespace FuturaLibrary::FileIO
 {
-	std::string ExtractNameFromFilePath(const std::string& filePath)
+	inline std::string ExtractNameFromFilePath(const std::string& filePath)
 	{
 		auto lastSlash = filePath.find_last_of("/\\");
 		lastSlash = (lastSlash == std::string::npos ? 0 : lastSlash + 1); 
@@ -17,7 +19,7 @@ namespace FuturaLibrary::FileIO
 		return filePath.substr(lastSlash, count);
 	}
 
-	std::string ReadFile(const std::string& filePath)
+	inline std::string ReadFile(const std::string& filePath)
 	{
 		FT_PROFILE_FUNCTION; 
 		std::string result; 

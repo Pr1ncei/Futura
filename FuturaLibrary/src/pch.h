@@ -9,6 +9,7 @@
 
 #include <string>
 #include <chrono>
+#include <cstdint>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -25,6 +26,6 @@
 	#include <Windows.h>
 #endif
 
-#ifdef defined(FT_PLATFORM_LINUX)
+#if defined(FT_PLATFORM_LINUX)
 	#include <X11/Xlib.h>
 #endif

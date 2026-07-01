@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "pch.h"
+#include "FuturaLibrary/core/c_core.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,7 +21,7 @@ const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f; 
 
-class Camera 
+class FT_API Camera 
 {
 private:    
     void updateCameraVectors();

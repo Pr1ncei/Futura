@@ -9,7 +9,7 @@ namespace FuturaLibrary
 	// It basiscally uses the Stack Data Structure (Push and Pop)
 	// This is use for the UI hierarchy such as the GameUI (Menu, Health, Weapon Select) is on top of the Game
 	// I mean you kinda have to stack the layers, what else should you do for it :P
-	class FT_API LayerStack
+	class LayerStack
 	{
 	public:
 		LayerStack() = default;
@@ -29,10 +29,28 @@ namespace FuturaLibrary
 			layer->OnAttach();
 		}
 
+		template <typename T>
+			requires(std::is_base_of_v<Layer, T>)
+		T* PushLayer()
+		{
+			T* layer = new T();
+			PushLayer(layer);
+			return layer;
+		}
+
 		void PushOverlay(Layer* overlay)
 		{
 			m_Layers.emplace_back(overlay); 
 			overlay->OnAttach(); 
+		}
+
+		template <typename T>
+			requires(std::is_base_of_v<Layer, T>)
+		T* PushOverlay()
+		{
+			T* overlay = new T();
+			PushOverlay(overlay);
+			return overlay;
 		}
 
 		void PopLayer(Layer* layer)
@@ -62,7 +80,7 @@ namespace FuturaLibrary
 		{
 			for (const auto& layer : m_Layers) 
 			{
-				if (auto casted = dynamic_cast<T*>(layer.get()))
+				if (auto casted = dynamic_cast<T*>(layer))
 				{
 					return casted; 
 				}

@@ -27,7 +27,7 @@ namespace FuturaLibrary
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 	}
 
-	std::unique_ptr<VertexBuffer> Create(float* vertices, uint32_t size)
+	std::unique_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
 		return std::make_unique<VertexBuffer>(vertices, size); 
 	}
@@ -53,7 +53,7 @@ namespace FuturaLibrary
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID); 
 	}
 
-	std::unique_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t count)
+	std::unique_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
 		return std::make_unique<IndexBuffer>(indices, count); 
 	}

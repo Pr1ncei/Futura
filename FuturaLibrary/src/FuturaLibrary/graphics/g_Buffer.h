@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include "FuturaLibrary/core/c_core.h"
 namespace FuturaLibrary
 {
 	enum class ShaderDataType
@@ -28,7 +29,7 @@ namespace FuturaLibrary
 		case ShaderDataType::Float3: return 4 * 3;
 		case ShaderDataType::Float4: return 4 * 4;
 		case ShaderDataType::Mat3:	 return 4 * 3 * 3; 
-		case ShaderDataType::Mat4:	 return 4 * 3 * 4;
+		case ShaderDataType::Mat4:	 return 4 * 4 * 4;
 		case ShaderDataType::Int:	 return 4; 
 		case ShaderDataType::Int2:	 return 4 * 2;
 		case ShaderDataType::Int3:   return 4 * 3;
@@ -102,7 +103,7 @@ namespace FuturaLibrary
 	};
 
 	// Wraps an OpenGL VBO and stores vertex data in GPU mem
-	class VertexBuffer
+	class FT_API VertexBuffer
 	{
 	public: 
 		VertexBuffer(float* vertices, uint32_t count); 
@@ -127,7 +128,7 @@ namespace FuturaLibrary
 	};
 
 	// Wraps OpenGL EBO and stores indices for drawing vertices efficiently 
-	class IndexBuffer
+	class FT_API IndexBuffer
 	{
 	public:
 		IndexBuffer(uint32_t* indices, uint32_t count); 
@@ -152,7 +153,7 @@ namespace FuturaLibrary
 
 	// Wraps OpenGL SSBO and can store large, arbitrary data accessible in shaders
 	// Quite useful for bsp nodes, lights, and particle data 
-	class StorageBuffer
+	class FT_API StorageBuffer
 	{
 	public:
 		StorageBuffer(uint32_t target, const void* data, uint32_t size, uint32_t flags); 

@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 {
 	FuturaLibrary::EventLog::Init();
 
-	auto app = FuturaLibrary::CreateApplication();
+	auto app = FuturaLibrary::CreateApplication("Futura/assets");
 	app->Run();
 	return 0;
 }

@@ -5,19 +5,21 @@
 #include "pch.h"
 #include "c_application.h"
 
+#include "FuturaLibrary/resources/r_ResourceManager.h"
 #include "FuturaLibrary/utils/u_eventlog.h"
 #include <GLFW/glfw3.h>
 
 namespace FuturaLibrary
 {
     Application* Application::s_Instance = nullptr; 
-    Application::Application(const std::string& assetRoot)
+    Application::Application(const std::string& assetRoot) : m_AssetRoot(assetRoot)
     { 
         FT_PROFILE_FUNCTION; 
         FT_CORE_ASSERT(!s_Instance, "Application Already Exists!"); 
         s_Instance = this; 
         m_Window = std::unique_ptr<Window>(Window::Create());
-        m_Window->SetEventCallback(std::bind(Application::OnEvent, this, std::placeholders::_1));
+        m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        ResourceManager::Initialize(m_AssetRoot);
     }
 
     Application::~Application() { FT_PROFILE_FUNCTION; }
@@ -25,19 +27,38 @@ namespace FuturaLibrary
     void Application::Run()
     {
         FT_PROFILE_FUNCTION; 
-        while (m_Running); // Game Initializer 
+        while (m_Running)
+        {
+            for (Layer* layer : m_LayerStack)
+            {
+                layer->OnUpdate();
+                layer->OnRender();
+            }
+
+            m_Window->OnUpdate();
+        }
     }
 
     void Application::Close() { m_Running = false; }
+
+    Window& Application::GetWindow()
+    {
+        return *m_Window;
+    }
+
+    Application& Application::Get()
+    {
+        return *s_Instance;
+    }
 
     void Application::OnEvent(Event& e)
     {
         FT_PROFILE_FUNCTION;
         EventDispatcher dispatcher(e); 
         dispatcher.Dispatch<WindowCloseEvent>(
-            std::bind(Application::OnWindowClose, this, std::placeholders::_1));
+            std::bind(&Application::OnWindowClose, this, std::placeholders::_1));
         dispatcher.Dispatch<WindowResizeEvent>(
-            std::bind(Application::OnWindowResize, this, std::placeholders::_1));
+            std::bind(&Application::OnWindowResize, this, std::placeholders::_1));
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
             (*--it)->OnEvent(e);
             if (e.Handled()) {

@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include "FuturaLibrary/core/c_core.h"
 #include <string>
 #include <unordered_map>
 #include <glm/glm.hpp>
 typedef unsigned int GLenum;
 namespace FuturaLibrary
 {
-    class Shader
+    class FT_API Shader
     {
     public:
         Shader(const std::string& filePath, const std::string& globalIncludeSource); 
@@ -43,7 +44,7 @@ namespace FuturaLibrary
         std::string m_filePath; 
     };
 
-    class ShaderLibrary
+    class FT_API ShaderLibrary
     {
     public: 
         void Add(const Ref<Shader>& shader); 
