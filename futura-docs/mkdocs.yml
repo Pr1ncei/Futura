@@ -1,0 +1,15 @@
+site_name: Futura
+site_description: Documentation for the Futura classic FPS engine/game project.
+site_author: Prince Pamintuan
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Purpose: purpose.md
+  - Current Progress: current-progress.md
+  - Technicals and Architecture: architecture.md
+  - OpenGL Refresher: opengl-refresher.md
+  - Development Conventions: development-conventions.md
