@@ -72,4 +72,13 @@ namespace FuturaLibrary
 		FT_CORE_ASSERT(indexBuffer, "Renderer::Submit currently requires an index buffer!");
 		glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
+
+	void Renderer::Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform)
+	{
+		FT_CORE_ASSERT(material, "Renderer::Submit received a null material!");
+		FT_CORE_ASSERT(mesh, "Renderer::Submit received a null mesh!");
+
+		material->Bind();
+		Submit(material->GetShader(), mesh->GetVertexArray(), transform);
+	}
 }

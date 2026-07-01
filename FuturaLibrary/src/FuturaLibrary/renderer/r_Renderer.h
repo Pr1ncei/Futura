@@ -4,6 +4,8 @@
 
 #include "FuturaLibrary/graphics/g_Shader.h"
 #include "FuturaLibrary/graphics/g_VertexArray.h"
+#include "FuturaLibrary/renderer/r_Material.h"
+#include "FuturaLibrary/renderer/r_Mesh.h"
 #include <glm/glm.hpp>
 
 namespace FuturaLibrary
@@ -17,6 +19,7 @@ namespace FuturaLibrary
 		static void BeginScene(const glm::mat4& viewProjection);
 		static void EndScene(); 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform); 
+		static void Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform);
 
 	private: 
 		struct SceneData

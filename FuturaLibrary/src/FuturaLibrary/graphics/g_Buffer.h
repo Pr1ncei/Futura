@@ -106,7 +106,7 @@ namespace FuturaLibrary
 	class FT_API VertexBuffer
 	{
 	public: 
-		VertexBuffer(float* vertices, uint32_t count); 
+		VertexBuffer(const void* vertices, uint32_t count); 
 		~VertexBuffer(); 
 		
 		VertexBuffer(const VertexBuffer&) = delete;
@@ -120,7 +120,7 @@ namespace FuturaLibrary
 		inline const BufferLayout& GetLayout() const		{ return m_Layout; }
 		
 		void Bind() const;
-		static std::unique_ptr<VertexBuffer> Create(float* vertices, uint32_t count); 
+		static std::unique_ptr<VertexBuffer> Create(const void* vertices, uint32_t count); 
 
 	private:
 		uint32_t m_RendererID; 
@@ -131,7 +131,7 @@ namespace FuturaLibrary
 	class FT_API IndexBuffer
 	{
 	public:
-		IndexBuffer(uint32_t* indices, uint32_t count); 
+		IndexBuffer(const uint32_t* indices, uint32_t count); 
 		~IndexBuffer(); 
 
 		IndexBuffer(const IndexBuffer&) = delete; 
@@ -144,7 +144,7 @@ namespace FuturaLibrary
 		uint32_t GetID() const		{ return m_RendererID; }
 
 		void Bind() const;
-		static std::unique_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t size); 
+		static std::unique_ptr<IndexBuffer> Create(const uint32_t* indices, uint32_t size); 
 
 	private: 
 		uint32_t m_RendererID; 

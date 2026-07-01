@@ -16,9 +16,10 @@
 
 #include "FuturaLibrary/core/c_camera.h"
 #include "FuturaLibrary/core/c_Layer.h"
-#include "FuturaLibrary/graphics/g_Shader.h"
-#include "FuturaLibrary/graphics/g_texture.h"
-#include "FuturaLibrary/graphics/g_VertexArray.h"
+#include "FuturaLibrary/events/e_KeyEvent.h"
+#include "FuturaLibrary/events/e_MouseEvent.h"
+#include "FuturaLibrary/renderer/r_Material.h"
+#include "FuturaLibrary/renderer/r_Mesh.h"
 
 class GameLayer : public FuturaLibrary::Layer
 {
@@ -29,10 +30,23 @@ public:
 	void OnAttach() override;
 	void OnUpdate() override;
 	void OnRender() override;
+	void OnEvent(FuturaLibrary::Event& event) override;
 
 private:
-	FuturaLibrary::Ref<FuturaLibrary::Shader> m_Shader;
-	FuturaLibrary::Ref<FuturaLibrary::Texture2D> m_Texture;
-	FuturaLibrary::Ref<FuturaLibrary::VertexArray> m_VertexArray;
+	bool OnKeyPressed(FuturaLibrary::KeyPressedEvent& event);
+	bool OnKeyReleased(FuturaLibrary::KeyReleasedEvent& event);
+	bool OnMouseMoved(FuturaLibrary::MouseMovedEvent& event);
+	bool OnMouseScrolled(FuturaLibrary::MouseScrolledEvent& event);
+
+	FuturaLibrary::Ref<FuturaLibrary::Mesh> m_CubeMesh;
+	FuturaLibrary::Ref<FuturaLibrary::Material> m_CubeMaterial;
 	Camera m_Camera;
+	float m_LastFrameTime = 0.0f;
+	float m_LastMouseX = 0.0f;
+	float m_LastMouseY = 0.0f;
+	bool m_FirstMouseMove = true;
+	bool m_MoveForward = false;
+	bool m_MoveBackward = false;
+	bool m_MoveLeft = false;
+	bool m_MoveRight = false;
 };
