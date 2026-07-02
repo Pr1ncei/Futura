@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "c_application.h"
 
+#include "FuturaLibrary/events/e_EventJournal.h"
 #include "FuturaLibrary/resources/r_ResourceManager.h"
 #include "FuturaLibrary/utils/u_eventlog.h"
 #include <GLFW/glfw3.h>
@@ -12,11 +13,36 @@
 namespace FuturaLibrary
 {
     Application* Application::s_Instance = nullptr; 
-    Application::Application(const std::string& assetRoot) : m_AssetRoot(assetRoot)
+    Application::Application(const std::string& assetRoot)
+        : Application(ApplicationConfig{ assetRoot })
+    {
+    }
+
+    Application::Application(const ApplicationConfig& config)
+        : m_AssetRoot(config.AssetRoot)
     { 
         FT_PROFILE_FUNCTION; 
         FT_CORE_ASSERT(!s_Instance, "Application Already Exists!"); 
         s_Instance = this; 
+
+        EventJournal::Settings journalSettings;
+        journalSettings.JournalPath = config.JournalPath;
+        journalSettings.AllowEnvironmentOverride = config.AllowEnvironmentJournalOverride;
+        switch (config.JournalMode)
+        {
+            case EventJournalMode::Record:
+                journalSettings.JournalMode = EventJournal::Mode::Record;
+                break;
+            case EventJournalMode::Playback:
+                journalSettings.JournalMode = EventJournal::Mode::Playback;
+                break;
+            case EventJournalMode::Off:
+            default:
+                journalSettings.JournalMode = EventJournal::Mode::Off;
+                break;
+        }
+
+        m_EventJournal = std::make_unique<EventJournal>(journalSettings);
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         ResourceManager::Initialize(m_AssetRoot);
@@ -29,13 +55,21 @@ namespace FuturaLibrary
         FT_PROFILE_FUNCTION; 
         while (m_Running)
         {
+            m_EventJournal->BeginFrame(m_FrameIndex);
+
             for (Layer* layer : m_LayerStack)
             {
                 layer->OnUpdate();
                 layer->OnRender();
             }
 
+            m_EventJournal->DispatchPlaybackEvents([this](Event& event)
+            {
+                OnEvent(event);
+            });
+
             m_Window->OnUpdate();
+            m_FrameIndex++;
         }
     }
 
@@ -54,6 +88,15 @@ namespace FuturaLibrary
     void Application::OnEvent(Event& e)
     {
         FT_PROFILE_FUNCTION;
+        if (m_EventJournal->ShouldIgnoreLiveEvent(e))
+            return;
+
+        m_EventJournal->RecordEvent(e);
+        DispatchEvent(e);
+    }
+
+    void Application::DispatchEvent(Event& e)
+    {
         EventDispatcher dispatcher(e); 
         dispatcher.Dispatch<WindowCloseEvent>(
             std::bind(&Application::OnWindowClose, this, std::placeholders::_1));
