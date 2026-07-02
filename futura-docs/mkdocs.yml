@@ -11,5 +11,6 @@ nav:
   - Purpose: purpose.md
   - Current Progress: current-progress.md
   - Technicals and Architecture: architecture.md
+  - Event Journal: event-journal.md
   - OpenGL Refresher: opengl-refresher.md
   - Development Conventions: development-conventions.md
