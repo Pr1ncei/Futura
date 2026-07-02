@@ -103,13 +103,15 @@ Prefer explicit namespaces in source code. Avoid `using namespace ...` in projec
 
 ```text
 Phase 1: Rendering pipeline + FPS controls
-Phase 2: Managers and renderer abstraction
-Phase 3: BSP world system: rendering, collision, PVS
-Phase 4: GoldSrc-style entity system
-Phase 5: FPS gameplay: weapons, health, game rules
-Phase 6: Multiplayer architecture
-Phase 7: Multiplayer gameplay
-Phase 8: Optimization and polish
+Phase 2: Runtime foundation, event flow, renderer/resource cleanup
+Phase 3: Static world geometry + collision prototype
+Phase 4: BSP world system: rendering, collision, PVS
+Phase 5: Entity System + map/gameplay scripting foundation
+Phase 6: FPS gameplay: weapons, health, teams, rounds, damage
+Phase 7: Network-ready simulation architecture
+Phase 8: Multiplayer implementation
+Phase 9: Multiplayer gameplay polish
+Phase 10: Optimization, tools, and content pipeline
 ```
 
 This roadmap is flexible. The immediate priority is Phase 2 stabilization, not feature expansion.
