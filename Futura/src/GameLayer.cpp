@@ -17,40 +17,10 @@
 #include "FuturaLibrary/core/c_application.h"
 #include "FuturaLibrary/resources/r_ResourceManager.h"
 #include "FuturaLibrary/renderer/r_Renderer.h"
-#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace
-{
-	constexpr int KeyW = 87;
-	constexpr int KeyA = 65;
-	constexpr int KeyS = 83;
-	constexpr int KeyD = 68;
-
-	void ProcessCameraKeyboard(
-		Camera& camera,
-		bool moveForward,
-		bool moveBackward,
-		bool moveLeft,
-		bool moveRight,
-		float deltaTime
-	)
-	{
-		const float velocity = camera.MovementSpeed * deltaTime;
-
-		if (moveForward)
-			camera.Position += camera.Front * velocity;
-		if (moveBackward)
-			camera.Position -= camera.Front * velocity;
-		if (moveLeft)
-			camera.Position -= camera.Right * velocity;
-		if (moveRight)
-			camera.Position += camera.Right * velocity;
-	}
-}
-
 GameLayer::GameLayer()
-	: FuturaLibrary::Layer("GameLayer"), m_Camera(glm::vec3(0.0f, 0.0f, 3.0f))
+	: FuturaLibrary::Layer("GameLayer"), m_CameraController(glm::vec3(0.0f, 0.0f, 3.0f))
 {
 }
 
@@ -75,14 +45,7 @@ void GameLayer::OnUpdate()
 	const float deltaTime = currentTime - m_LastFrameTime;
 	m_LastFrameTime = currentTime;
 
-	ProcessCameraKeyboard(
-		m_Camera,
-		m_MoveForward,
-		m_MoveBackward,
-		m_MoveLeft,
-		m_MoveRight,
-		deltaTime
-	);
+	m_CameraController.OnUpdate(deltaTime);
 }
 
 void GameLayer::OnRender()
@@ -91,13 +54,7 @@ void GameLayer::OnRender()
 	FuturaLibrary::Renderer::Clear();
 
 	FuturaLibrary::Window& window = FuturaLibrary::Application::Get().GetWindow();
-	glm::mat4 projection = glm::perspective(
-		glm::radians(m_Camera.Zoom),
-		window.GetAspectRatio(),
-		0.1f,
-		100.0f
-	);
-	glm::mat4 viewProjection = projection * m_Camera.GetViewMatrix();
+	glm::mat4 viewProjection = m_CameraController.GetCamera().GetViewProjectionMatrix(window.GetAspectRatio());
 
 	glm::mat4 transform = glm::mat4(1.0f);
 	transform = glm::rotate(transform, static_cast<float>(window.GetTime()), glm::vec3(0.25f, 1.0f, 0.0f));
@@ -109,74 +66,5 @@ void GameLayer::OnRender()
 
 void GameLayer::OnEvent(FuturaLibrary::Event& event)
 {
-	FuturaLibrary::EventDispatcher dispatcher(event);
-	dispatcher.Dispatch<FuturaLibrary::KeyPressedEvent>(
-		std::bind(&GameLayer::OnKeyPressed, this, std::placeholders::_1)
-	);
-	dispatcher.Dispatch<FuturaLibrary::KeyReleasedEvent>(
-		std::bind(&GameLayer::OnKeyReleased, this, std::placeholders::_1)
-	);
-	dispatcher.Dispatch<FuturaLibrary::MouseMovedEvent>(
-		std::bind(&GameLayer::OnMouseMoved, this, std::placeholders::_1)
-	);
-	dispatcher.Dispatch<FuturaLibrary::MouseScrolledEvent>(
-		std::bind(&GameLayer::OnMouseScrolled, this, std::placeholders::_1)
-	);
-}
-
-bool GameLayer::OnKeyPressed(FuturaLibrary::KeyPressedEvent& event)
-{
-	switch (event.GetKeyCode())
-	{
-		case KeyW: m_MoveForward = true; break;
-		case KeyS: m_MoveBackward = true; break;
-		case KeyA: m_MoveLeft = true; break;
-		case KeyD: m_MoveRight = true; break;
-		default: break;
-	}
-
-	return false;
-}
-
-bool GameLayer::OnKeyReleased(FuturaLibrary::KeyReleasedEvent& event)
-{
-	switch (event.GetKeyCode())
-	{
-		case KeyW: m_MoveForward = false; break;
-		case KeyS: m_MoveBackward = false; break;
-		case KeyA: m_MoveLeft = false; break;
-		case KeyD: m_MoveRight = false; break;
-		default: break;
-	}
-
-	return false;
-}
-
-bool GameLayer::OnMouseMoved(FuturaLibrary::MouseMovedEvent& event)
-{
-	const float mouseX = event.GetX();
-	const float mouseY = event.GetY();
-
-	if (m_FirstMouseMove)
-	{
-		m_LastMouseX = mouseX;
-		m_LastMouseY = mouseY;
-		m_FirstMouseMove = false;
-		return false;
-	}
-
-	const float xOffset = mouseX - m_LastMouseX;
-	const float yOffset = m_LastMouseY - mouseY;
-	m_LastMouseX = mouseX;
-	m_LastMouseY = mouseY;
-
-	m_Camera.ProcessMouseMovement(xOffset, yOffset);
-	return false;
-}
-
-bool GameLayer::OnMouseScrolled(FuturaLibrary::MouseScrolledEvent& event)
-{
-	m_Camera.Zoom -= event.GetYOffset();
-	m_Camera.Zoom = std::clamp(m_Camera.Zoom, 1.0f, 45.0f);
-	return false;
+	m_CameraController.OnEvent(event);
 }
