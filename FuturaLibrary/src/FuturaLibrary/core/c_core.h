@@ -1,7 +1,12 @@
 #pragma once
-#include "pch.h"
+#include <functional>
 #include <memory>
 #include <type_traits>
+#include <utility>
+
+#ifdef FT_PLATFORM_WINDOWS
+	#include <Windows.h>
+#endif
 
 #ifdef FT_PLATFORM_WINDOWS
 #ifdef FT_BUILD_DLL
