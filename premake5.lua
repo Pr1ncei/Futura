@@ -55,7 +55,9 @@ project "FuturaLibrary"
     "%{prj.name}/vendor/GLAD/include",
     "%{prj.name}/vendor/GLFW/include",
     "%{prj.name}/vendor/glm",
-    "%{prj.name}/vendor/stb_image"
+    "%{prj.name}/vendor/stb_image",
+
+    "F:/Development/vcpkg/installed/x64-windows/include"
   }
 
   defines
@@ -72,23 +74,32 @@ project "FuturaLibrary"
     defines
     {
       "FT_PLATFORM_WINDOWS",
-      "FT_BUILD_DLL"
+      "FT_BUILD_DLL",
+      "FT_ENABLE_ASSIMP"
     }
 
     links
     {
       "glfw3",
-      "opengl32"
+      "opengl32",
+      "assimp-vc145-mt"
     }
 
     libdirs
     {
-      "%{prj.name}/vendor/GLFW/lib"
+      "%{prj.name}/vendor/GLFW/lib",
+      "F:/Development/vcpkg/installed/x64-windows/lib"
     }
 
     postbuildcommands
     {
-      "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Futura"
+      "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/assimp-vc145-mt.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/kubazip.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/minizip.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/poly2tri.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/pugixml.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/z.dll ../bin/" .. outputdir .. "/Futura"
 
       -- "{COPYDIR} ../Futura/assets %{cfg.targetdir}/assets"
     }
@@ -139,6 +150,11 @@ project "Futura"
   {
     "%{prj.name}/src/**.h",
     "%{prj.name}/src/**.cpp"
+  }
+
+  removefiles
+  {
+    "%{prj.name}/assets/**.obj"
   }
 
   includedirs

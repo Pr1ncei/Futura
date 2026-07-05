@@ -6,6 +6,8 @@ namespace FuturaLibrary
 	Material::Material(const Ref<Shader>& shader)
 		: m_Shader(shader)
 	{
+		SetFloat4("u_AlbedoColor", glm::vec4(1.0f));
+		SetInt("u_HasTexture", 0);
 	}
 
 	Material::Material(const Ref<Shader>& shader, const Ref<Texture2D>& albedoTexture)
@@ -52,6 +54,7 @@ namespace FuturaLibrary
 	void Material::SetAlbedoTexture(const Ref<Texture2D>& texture, uint32_t slot)
 	{
 		SetTexture("u_Texture", texture, slot, MaterialTextureType::Albedo);
+		SetInt("u_HasTexture", texture ? 1 : 0);
 	}
 
 	void Material::SetLightmapTexture(const Ref<Texture2D>& texture, uint32_t slot)

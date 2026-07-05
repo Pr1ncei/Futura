@@ -27,6 +27,14 @@ namespace FuturaLibrary
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 	}
 
+	void VertexBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
+	{
+		FT_PROFILE_FUNCTION;
+		FT_CORE_ASSERT(m_RendererID != 0, "Attempted to update an uninitialized VertexBuffer");
+		FT_CORE_ASSERT(data, "VertexBuffer::SetData received null data");
+		glNamedBufferSubData(m_RendererID, offset, size, data);
+	}
+
 	std::unique_ptr<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size)
 	{
 		return std::make_unique<VertexBuffer>(vertices, size); 

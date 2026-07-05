@@ -51,7 +51,10 @@ namespace FuturaLibrary
 		static void SetCullFace(RenderCullFace face);
 		static void SetViewport(const RenderViewport& viewport);
 		static void SetClearColor(const glm::vec4& color);
+		static void SetLineWidth(float width);
 		static void Clear(const RenderClearState& clearState);
 		static void DrawIndexed(const Ref<VertexArray>& vertexArray);
+		static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount);
+		static bool CheckErrors(const char* label = nullptr);
 	};
 }
