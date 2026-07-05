@@ -17,7 +17,6 @@
 #include "FuturaLibrary/core/c_FPSCameraController.h"
 #include "FuturaLibrary/core/c_Layer.h"
 #include "FuturaLibrary/renderer/r_Material.h"
-#include "FuturaLibrary/renderer/r_Mesh.h"
 #include "FuturaLibrary/resources/r_Model.h"
 
 class GameLayer : public FuturaLibrary::Layer
@@ -32,9 +31,10 @@ public:
 	void OnEvent(FuturaLibrary::Event& event) override;
 
 private:
-	FuturaLibrary::Ref<FuturaLibrary::Mesh> m_CubeMesh;
-	FuturaLibrary::Ref<FuturaLibrary::Material> m_CubeMaterial;
-	FuturaLibrary::Ref<FuturaLibrary::Model> m_RubixCubeModel;
+	FuturaLibrary::Ref<FuturaLibrary::Material> m_DefaultMaterial;
+	FuturaLibrary::Ref<FuturaLibrary::Model> m_TestCityModel;
 	FuturaLibrary::FPSCameraController m_CameraController;
 	float m_LastFrameTime = 0.0f;
+	float m_FPSUpdateTimer = 0.0f;
+	uint32_t m_FrameCounter = 0;
 };

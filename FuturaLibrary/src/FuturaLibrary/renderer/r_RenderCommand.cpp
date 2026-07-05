@@ -42,6 +42,20 @@ namespace FuturaLibrary
 			FT_CORE_ASSERT(false, "Unknown render cull face!");
 			return GL_BACK;
 		}
+
+		const char* GLErrorToString(GLenum error)
+		{
+			switch (error)
+			{
+				case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+				case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+				case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+				case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+				case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+			}
+
+			return "Unknown OpenGL error";
+		}
 	}
 
 	// Depth testing lets closer pixels hide farther pixels
@@ -80,6 +94,11 @@ namespace FuturaLibrary
 		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
+	void RenderCommand::SetLineWidth(float width)
+	{
+		glLineWidth(width);
+	}
+
 	void RenderCommand::Clear(const RenderClearState& clearState)
 	{
 		SetClearColor(clearState.Color);
@@ -104,5 +123,33 @@ namespace FuturaLibrary
 		const Ref<IndexBuffer>& indexBuffer = vertexArray->GetIndexBuffer();
 		FT_CORE_ASSERT(indexBuffer, "RenderCommand::DrawIndexed currently requires an index buffer!");
 		glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void RenderCommand::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+	{
+		FT_CORE_ASSERT(vertexArray, "RenderCommand::DrawLines received a null vertex array!");
+		if (vertexCount == 0)
+			return;
+
+		vertexArray->Bind();
+		glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(vertexCount));
+	}
+
+	bool RenderCommand::CheckErrors(const char* label)
+	{
+		bool foundError = false;
+		GLenum error = glGetError();
+		while (error != GL_NO_ERROR)
+		{
+			foundError = true;
+			if (label)
+				FT_CORE_ERROR("OpenGL error after {0}: {1} ({2})", label, GLErrorToString(error), error);
+			else
+				FT_CORE_ERROR("OpenGL error: {0} ({1})", GLErrorToString(error), error);
+
+			error = glGetError();
+		}
+
+		return foundError;
 	}
 }

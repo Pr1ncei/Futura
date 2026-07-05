@@ -152,6 +152,11 @@ project "Futura"
     "%{prj.name}/src/**.cpp"
   }
 
+  removefiles
+  {
+    "%{prj.name}/assets/**.obj"
+  }
+
   includedirs
   {
     "FuturaLibrary/src",

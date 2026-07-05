@@ -120,6 +120,7 @@ namespace FuturaLibrary
 		inline const BufferLayout& GetLayout() const		{ return m_Layout; }
 		
 		void Bind() const;
+		void SetData(const void* data, uint32_t size, uint32_t offset = 0);
 		static std::unique_ptr<VertexBuffer> Create(const void* vertices, uint32_t count); 
 
 	private:
