@@ -32,7 +32,8 @@ void GameLayer::OnAttach()
 	auto texture = FuturaLibrary::ResourceManager::LoadTexture2D("Gate", "texture/gate.jpg");
 
 	m_CubeMesh = FuturaLibrary::Mesh::CreateCube();
-	m_CubeMaterial = FuturaLibrary::CreateRef<FuturaLibrary::Material>(shader, texture);
+	m_CubeMaterial = FuturaLibrary::CreateRef<FuturaLibrary::Material>(shader);
+	m_CubeMaterial->SetAlbedoTexture(texture);
 
 	FuturaLibrary::Application::Get().GetWindow().SetCursorVisibility();
 	m_LastFrameTime = static_cast<float>(FuturaLibrary::Application::Get().GetWindow().GetTime());
