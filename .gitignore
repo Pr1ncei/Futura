@@ -5,6 +5,7 @@
 # Compiled object files
 *.o
 *.obj
+!Futura/assets/models/*.obj
 *.lo
 *.la
 *.al

@@ -18,6 +18,7 @@
 #include "FuturaLibrary/core/c_Layer.h"
 #include "FuturaLibrary/renderer/r_Material.h"
 #include "FuturaLibrary/renderer/r_Mesh.h"
+#include "FuturaLibrary/resources/r_Model.h"
 
 class GameLayer : public FuturaLibrary::Layer
 {
@@ -33,6 +34,7 @@ public:
 private:
 	FuturaLibrary::Ref<FuturaLibrary::Mesh> m_CubeMesh;
 	FuturaLibrary::Ref<FuturaLibrary::Material> m_CubeMaterial;
+	FuturaLibrary::Ref<FuturaLibrary::Model> m_RubixCubeModel;
 	FuturaLibrary::FPSCameraController m_CameraController;
 	float m_LastFrameTime = 0.0f;
 };

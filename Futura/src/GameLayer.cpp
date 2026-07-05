@@ -34,6 +34,7 @@ void GameLayer::OnAttach()
 	m_CubeMesh = FuturaLibrary::Mesh::CreateCube();
 	m_CubeMaterial = FuturaLibrary::CreateRef<FuturaLibrary::Material>(shader);
 	m_CubeMaterial->SetAlbedoTexture(texture);
+	m_RubixCubeModel = FuturaLibrary::ResourceManager::LoadModel("RubixCube", "models/RubixCube.obj", shader);
 
 	FuturaLibrary::Application::Get().GetWindow().SetCursorVisibility();
 	m_LastFrameTime = static_cast<float>(FuturaLibrary::Application::Get().GetWindow().GetTime());
@@ -60,9 +61,23 @@ void GameLayer::OnRender()
 
 	glm::mat4 transform = glm::mat4(1.0f);
 	transform = glm::rotate(transform, static_cast<float>(window.GetTime()), glm::vec3(0.25f, 1.0f, 0.0f));
+	transform = glm::scale(transform, glm::vec3(0.75f));
 
 	FuturaLibrary::Renderer::BeginScene(viewProjection);
-	FuturaLibrary::Renderer::Submit({ m_CubeMaterial, m_CubeMesh, transform });
+	if (m_RubixCubeModel && !m_RubixCubeModel->IsEmpty())
+	{
+		for (const FuturaLibrary::ModelSubmesh& submesh : m_RubixCubeModel->GetSubmeshes())
+		{
+			if (submesh.Name.find("Plane") != std::string::npos)
+				continue;
+
+			FuturaLibrary::Renderer::Submit({ submesh.MaterialAsset ? submesh.MaterialAsset : m_CubeMaterial, submesh.MeshAsset, transform });
+		}
+	}
+	else
+	{
+		FuturaLibrary::Renderer::Submit({ m_CubeMaterial, m_CubeMesh, transform });
+	}
 	FuturaLibrary::Renderer::EndScene();
 }
 
