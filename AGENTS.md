@@ -25,8 +25,8 @@ Engine code must not depend on game/client code.
 
 ## Build and Development Commands
 
-* `GenerateProjects.bat`: regenerate the Visual Studio 2022 solution through Premake.
-* `vendor\bin\premake\premake5.exe vs2022`: regenerate the solution without the pause.
+* `GenerateProjects.bat`: regenerate the Visual Studio 2026 solution through Premake.
+* `vendor\bin\premake\premake5.exe vs2026`: regenerate the solution without the pause.
 * Open `Futura.sln` and build `Futura` in Visual Studio.
 * Configurations: `Debug`, `Release`, `Dist`.
 * From `futura-docs/`: run `mkdocs serve` to preview documentation.

@@ -13,6 +13,7 @@
 
 # Compiled binary/executables
 *.exe
+!vendor/bin/premake/premake5.exe
 *.out
 *.app
 *.so
@@ -29,6 +30,7 @@
 .vscode/
 *.code-workspace
 *.sln
+*.slnx
 *.vcxproj*
 *.user
 *.opensdf

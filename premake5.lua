@@ -64,7 +64,7 @@ project "FuturaLibrary"
   }
 
   filter "system:windows"
-    toolset "v143"
+    toolset "v145"
     cppdialect "C++20"
     staticruntime "Off"
     systemversion "latest"
@@ -157,7 +157,7 @@ project "Futura"
   }
 
   filter "system:windows"
-    toolset "v143"
+    toolset "v145"
     cppdialect "C++20"
     staticruntime "Off"
     systemversion "latest"

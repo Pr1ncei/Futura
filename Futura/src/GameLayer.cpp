@@ -9,7 +9,7 @@
  *
  *      @author:             Prince Pamintuan
  *      @date:               July 01, 2026
- *      Last Modified on:    July 01, 2026
+ *      Last Modified on:    July 05, 2026
  */
 
 #include "GameLayer.h"
@@ -50,8 +50,9 @@ void GameLayer::OnUpdate()
 
 void GameLayer::OnRender()
 {
-	FuturaLibrary::Renderer::SetClearColor(glm::vec4(0.08f, 0.09f, 0.08f, 1.0f));
-	FuturaLibrary::Renderer::Clear();
+	FuturaLibrary::RenderFrameState frameState;
+	frameState.Clear.Color = glm::vec4(0.08f, 0.09f, 0.08f, 1.0f);
+	FuturaLibrary::Renderer::BeginFrame(frameState);
 
 	FuturaLibrary::Window& window = FuturaLibrary::Application::Get().GetWindow();
 	glm::mat4 viewProjection = m_CameraController.GetCamera().GetViewProjectionMatrix(window.GetAspectRatio());
@@ -60,7 +61,7 @@ void GameLayer::OnRender()
 	transform = glm::rotate(transform, static_cast<float>(window.GetTime()), glm::vec3(0.25f, 1.0f, 0.0f));
 
 	FuturaLibrary::Renderer::BeginScene(viewProjection);
-	FuturaLibrary::Renderer::Submit(m_CubeMaterial, m_CubeMesh, transform);
+	FuturaLibrary::Renderer::Submit({ m_CubeMaterial, m_CubeMesh, transform });
 	FuturaLibrary::Renderer::EndScene();
 }
 
