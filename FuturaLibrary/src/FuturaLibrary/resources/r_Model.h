@@ -21,6 +21,7 @@ namespace FuturaLibrary
 		std::string Name;
 		Ref<Mesh> MeshAsset;
 		Ref<Material> MaterialAsset;
+		AxisAlignedBounds LocalBounds;
 		uint32_t MaterialIndex = 0;
 	};
 
@@ -34,10 +35,12 @@ namespace FuturaLibrary
 
 		const std::string& GetSourcePath() const { return m_SourcePath; }
 		const std::vector<ModelSubmesh>& GetSubmeshes() const { return m_Submeshes; }
+		const AxisAlignedBounds& GetLocalBounds() const { return m_LocalBounds; }
 		bool IsEmpty() const { return m_Submeshes.empty(); }
 
 	private:
 		std::string m_SourcePath;
 		std::vector<ModelSubmesh> m_Submeshes;
+		AxisAlignedBounds m_LocalBounds;
 	};
 }

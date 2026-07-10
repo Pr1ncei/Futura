@@ -17,7 +17,8 @@
 #include "FuturaLibrary/core/c_FPSCameraController.h"
 #include "FuturaLibrary/core/c_Layer.h"
 #include "FuturaLibrary/renderer/r_Material.h"
-#include "FuturaLibrary/resources/r_Model.h"
+
+#include "SceneWorld.h"
 
 class GameLayer : public FuturaLibrary::Layer
 {
@@ -32,7 +33,7 @@ public:
 
 private:
 	FuturaLibrary::Ref<FuturaLibrary::Material> m_DefaultMaterial;
-	FuturaLibrary::Ref<FuturaLibrary::Model> m_TestCityModel;
+	SceneWorld m_SceneWorld;
 	FuturaLibrary::FPSCameraController m_CameraController;
 	float m_LastFrameTime = 0.0f;
 	float m_FPSUpdateTimer = 0.0f;

@@ -18,10 +18,46 @@ namespace FuturaLibrary
 			vertex.LightmapTexCoord = texCoord;
 			return vertex;
 		}
+
+	}
+
+	AxisAlignedBounds CalculateMeshBounds(const std::vector<Vertex>& vertices)
+	{
+		AxisAlignedBounds bounds;
+		if (vertices.empty())
+			return bounds;
+
+		bounds.Min = vertices[0].Position;
+		bounds.Max = vertices[0].Position;
+		bounds.IsValid = true;
+
+		for (const Vertex& vertex : vertices)
+		{
+			bounds.Min.x = std::min(bounds.Min.x, vertex.Position.x);
+			bounds.Min.y = std::min(bounds.Min.y, vertex.Position.y);
+			bounds.Min.z = std::min(bounds.Min.z, vertex.Position.z);
+			bounds.Max.x = std::max(bounds.Max.x, vertex.Position.x);
+			bounds.Max.y = std::max(bounds.Max.y, vertex.Position.y);
+			bounds.Max.z = std::max(bounds.Max.z, vertex.Position.z);
+		}
+
+		return bounds;
 	}
 
 	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
-		: m_IndexCount(static_cast<uint32_t>(indices.size()))
+		: m_LocalBounds(CalculateMeshBounds(vertices)), m_IndexCount(static_cast<uint32_t>(indices.size()))
+	{
+		InitializeBuffers(vertices, indices);
+	}
+
+	Mesh::Mesh(const MeshData& meshData)
+		: m_LocalBounds(meshData.LocalBounds.IsValid ? meshData.LocalBounds : CalculateMeshBounds(meshData.Vertices)),
+		  m_IndexCount(static_cast<uint32_t>(meshData.Indices.size()))
+	{
+		InitializeBuffers(meshData.Vertices, meshData.Indices);
+	}
+
+	void Mesh::InitializeBuffers(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
 	{
 		FT_CORE_ASSERT(!vertices.empty(), "Mesh requires vertices!");
 		FT_CORE_ASSERT(!indices.empty(), "Mesh requires indices!");
@@ -45,11 +81,6 @@ namespace FuturaLibrary
 			m_IndexCount
 		);
 		m_VertexArray->SetIndexBuffer(indexBuffer);
-	}
-
-	Mesh::Mesh(const MeshData& meshData)
-		: Mesh(meshData.Vertices, meshData.Indices)
-	{
 	}
 
 	Ref<Mesh> Mesh::Create(const MeshData& meshData)

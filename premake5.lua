@@ -149,7 +149,8 @@ project "Futura"
   files
   {
     "%{prj.name}/src/**.h",
-    "%{prj.name}/src/**.cpp"
+    "%{prj.name}/src/**.cpp",
+    "%{prj.name}/assets/scenes/**.scene"
   }
 
   removefiles
