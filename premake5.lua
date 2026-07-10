@@ -36,13 +36,24 @@ project "FuturaLibrary"
     "%{prj.name}/vendor/GLAD/src/glad.c",
 
     -- stb_image implementation
-    "%{prj.name}/vendor/stb_image/stb_image.cpp"
+    "%{prj.name}/vendor/stb_image/stb_image.cpp",
+
+    -- Dear ImGui
+    "%{prj.name}/vendor/imgui/imgui.cpp",
+    "%{prj.name}/vendor/imgui/imgui_draw.cpp",
+    "%{prj.name}/vendor/imgui/imgui_tables.cpp",
+    "%{prj.name}/vendor/imgui/imgui_widgets.cpp",
+    "%{prj.name}/vendor/imgui/backends/imgui_impl_glfw.cpp",
+    "%{prj.name}/vendor/imgui/backends/imgui_impl_opengl3.cpp"
   }
 
   filter "files:**/glad.c"
     flags { "NoPCH" }
 
   filter "files:**/stb_image.cpp"
+    flags { "NoPCH" }
+
+  filter "files:**/imgui*.cpp"
     flags { "NoPCH" }
 
   filter {}
@@ -56,6 +67,8 @@ project "FuturaLibrary"
     "%{prj.name}/vendor/GLFW/include",
     "%{prj.name}/vendor/glm",
     "%{prj.name}/vendor/stb_image",
+    "%{prj.name}/vendor/imgui",
+    "%{prj.name}/vendor/imgui/backends",
 
     "F:/Development/vcpkg/installed/x64-windows/include"
   }
