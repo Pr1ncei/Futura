@@ -24,6 +24,14 @@ namespace FuturaLibrary
 		glm::mat4 Transform = glm::mat4(1.0f);
 	};
 
+	struct RenderStats
+	{
+		uint32_t DrawCalls = 0;
+		uint32_t SubmittedMeshes = 0;
+		uint32_t Triangles = 0;
+		uint32_t VisibleSurfaces = 0;
+	};
+
 	class FT_API Renderer
 	{
 	public: 
@@ -33,11 +41,13 @@ namespace FuturaLibrary
 		static void EndScene(); 
 		static void Submit(const RenderSubmission& submission);
 		static void Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform);
+		static const RenderStats& GetStats();
 
 	private: 
 		struct SceneData
 		{
 			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+			RenderStats Stats;
 		};
 
 		static SceneData* m_SceneData; 

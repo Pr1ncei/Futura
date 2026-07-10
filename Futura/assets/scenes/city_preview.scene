@@ -1,0 +1,5 @@
+# City model preview scene.
+model_name = TestCity
+model_path = models/Test.obj
+preview_scale = 0.001
+preview_offset = -216.9258,-3469.41,-13499.998

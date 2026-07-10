@@ -35,6 +35,8 @@ namespace FuturaLibrary
 	{
 		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
 
+		m_SceneData->Stats = {};
+
 		RenderCommand::SetDepthTest(frameState.State.DepthTest);
 		RenderCommand::SetFaceCulling(frameState.State.FaceCulling);
 		if (frameState.State.FaceCulling)
@@ -70,12 +72,18 @@ namespace FuturaLibrary
 		shader->SetMat4("u_Model", transform);
 
 		RenderCommand::DrawIndexed(vertexArray);
+		m_SceneData->Stats.DrawCalls++;
 	}
 
 	void Renderer::Submit(const RenderSubmission& submission)
 	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
 		FT_CORE_ASSERT(submission.Material, "Renderer::Submit received a null material!");
 		FT_CORE_ASSERT(submission.Mesh, "Renderer::Submit received a null mesh!");
+
+		m_SceneData->Stats.SubmittedMeshes++;
+		m_SceneData->Stats.Triangles += submission.Mesh->GetTriangleCount();
+		m_SceneData->Stats.VisibleSurfaces++;
 
 		submission.Material->Bind();
 		Submit(submission.Material->GetShader(), submission.Mesh->GetVertexArray(), submission.Transform);
@@ -84,5 +92,11 @@ namespace FuturaLibrary
 	void Renderer::Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform)
 	{
 		Submit({ material, mesh, transform });
+	}
+
+	const RenderStats& Renderer::GetStats()
+	{
+		static RenderStats emptyStats;
+		return m_SceneData ? m_SceneData->Stats : emptyStats;
 	}
 }

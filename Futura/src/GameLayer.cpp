@@ -19,7 +19,6 @@
 #include "FuturaLibrary/renderer/r_DebugRenderer.h"
 #include "FuturaLibrary/renderer/r_Renderer.h"
 #include "FuturaLibrary/renderer/r_RenderCommand.h"
-#include <glm/gtc/matrix_transform.hpp>
 #include <sstream>
 
 GameLayer::GameLayer()
@@ -35,7 +34,7 @@ void GameLayer::OnAttach()
 	auto debugShader = FuturaLibrary::ResourceManager::LoadShader("DebugLine", "shaders/DebugLine.glsl");
 
 	m_DefaultMaterial = FuturaLibrary::CreateRef<FuturaLibrary::Material>(shader);
-	m_TestCityModel = FuturaLibrary::ResourceManager::LoadModel("TestCity", "models/Test.obj", shader);
+	m_SceneWorld.LoadPreviewScene("scenes/city_preview.scene", shader);
 	FuturaLibrary::DebugRenderer::Initialize(debugShader);
 
 	FuturaLibrary::Application::Get().GetWindow().SetCursorVisibility();
@@ -57,11 +56,17 @@ void GameLayer::OnUpdate()
 	{
 		const float fps = static_cast<float>(m_FrameCounter) / m_FPSUpdateTimer;
 		const float frameMs = fps > 0.0f ? 1000.0f / fps : 0.0f;
+		const FuturaLibrary::RenderStats& renderStats = FuturaLibrary::Renderer::GetStats();
+		const FuturaLibrary::DebugDrawStats& debugStats = FuturaLibrary::DebugRenderer::GetStats();
 
 		std::ostringstream title;
 		title << "Futura | FPS: " << static_cast<int>(fps)
 			<< " | Frame: " << frameMs << " ms"
-			<< " | Debug Lines: " << FuturaLibrary::DebugRenderer::GetStats().LineCount;
+			<< " | Draws: " << renderStats.DrawCalls
+			<< " | Meshes: " << renderStats.SubmittedMeshes
+			<< " | Tris: " << renderStats.Triangles
+			<< " | Visible: " << renderStats.VisibleSurfaces
+			<< " | Debug Lines: " << debugStats.LineCount;
 		window.SetTitle(title.str());
 
 		m_FPSUpdateTimer = 0.0f;
@@ -78,16 +83,8 @@ void GameLayer::OnRender()
 	FuturaLibrary::Window& window = FuturaLibrary::Application::Get().GetWindow();
 	glm::mat4 viewProjection = m_CameraController.GetCamera().GetViewProjectionMatrix(window.GetAspectRatio());
 
-	glm::mat4 transform = glm::mat4(1.0f);
-	transform = glm::scale(transform, glm::vec3(0.001f));
-	transform = glm::translate(transform, glm::vec3(-216.9258f, -3469.41f, -13499.998f));
-
 	FuturaLibrary::Renderer::BeginScene(viewProjection);
-	if (m_TestCityModel && !m_TestCityModel->IsEmpty())
-	{
-		for (const FuturaLibrary::ModelSubmesh& submesh : m_TestCityModel->GetSubmeshes())
-			FuturaLibrary::Renderer::Submit({ submesh.MaterialAsset ? submesh.MaterialAsset : m_DefaultMaterial, submesh.MeshAsset, transform });
-	}
+	m_SceneWorld.Submit(m_DefaultMaterial);
 	FuturaLibrary::Renderer::EndScene();
 
 	FuturaLibrary::DebugRenderer::BeginScene(viewProjection);

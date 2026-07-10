@@ -56,3 +56,6 @@ lib/*.dll
 # Logs / temporary files
 *.log
 *.tmp
+
+# Generated asset import caches
+**/.futura-cache/

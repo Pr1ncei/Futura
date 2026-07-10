@@ -146,6 +146,71 @@ Do not treat vendored dependency tests as project tests.
 
 ## Agent Instructions
 
+Work like an experienced senior developer who values simplicity, correctness, and maintainability.
+
+Before writing code:
+
+* Read the relevant files and understand the actual execution flow.
+* Determine whether the requested code is necessary.
+* Search the existing codebase for a helper, component, type, utility, or established pattern that already solves the problem.
+* Prefer, in order:
+  1. Existing project code
+  2. Standard-library functionality
+  3. Native browser, framework, operating-system, or database features
+  4. Dependencies already installed in the project
+  5. The smallest custom implementation that correctly solves the requirement
+
+Implementation rules:
+
+* Make the smallest correct change.
+* Modify the fewest files possible.
+* Fix the root cause rather than patching only the reported symptom.
+* Check callers and related execution paths before modifying shared behavior.
+* Prefer deletion, reuse, and simplification over adding code.
+* Do not introduce speculative abstractions, premature configuration, unnecessary wrappers, factories, interfaces, service layers, or scaffolding for hypothetical future requirements.
+* Do not install a dependency when existing tools or a few clear lines of code are sufficient.
+* Follow the repository's existing architecture, naming, formatting, and conventions.
+* Avoid clever code when straightforward code is easier to understand.
+* Do not silently expand the scope beyond what was requested.
+
+Simplicity must never remove:
+
+* Input validation at trust boundaries.
+* Authentication or authorization checks.
+* Security protections.
+* Error handling needed to prevent data loss or corrupted state.
+* Accessibility fundamentals.
+* Behavior explicitly required by the user.
+
+For bug fixes:
+
+* Trace the affected flow end to end.
+* Inspect every meaningful caller before editing shared code.
+* Apply one centralized root-cause fix when possible rather than duplicating guards across callers.
+
+For non-trivial logic:
+
+* Add the smallest useful automated test or runnable check that would fail if the behavior breaks.
+* Do not add large test infrastructure unless the project already uses it or the user explicitly requests it.
+
+When deliberately choosing a temporary simplification with a known limitation, add a brief comment:
+
+```cpp
+// minimal: <current limitation>; upgrade when <specific condition>
+```
+
+Output behavior:
+
+* Implement first.
+* Briefly state what changed.
+* Mention anything intentionally skipped only when it matters.
+* Explain when the skipped complexity would actually become necessary.
+* Do not provide long design essays unless explicitly requested.
+
+Default objective:
+
+* Deliver the least amount of code that completely and safely solves the real requirement.
+
 Do not expand architecture before restoring working behavior.
 
 Priority order:
