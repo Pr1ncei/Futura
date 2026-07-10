@@ -11,6 +11,8 @@
 
 namespace FuturaLibrary
 {
+	class StaticWorld;
+
 	struct RenderFrameState
 	{
 		RenderClearState Clear;
@@ -30,6 +32,8 @@ namespace FuturaLibrary
 		uint32_t SubmittedMeshes = 0;
 		uint32_t Triangles = 0;
 		uint32_t VisibleSurfaces = 0;
+		uint32_t TotalSurfaces = 0;
+		uint32_t CulledSurfaces = 0;
 	};
 
 	class FT_API Renderer
@@ -39,8 +43,10 @@ namespace FuturaLibrary
 		static void BeginFrame(const RenderFrameState& frameState);
 		static void BeginScene(const glm::mat4& viewProjection);
 		static void EndScene(); 
+		static void Submit(const Ref<StaticWorld>& world, const Ref<Material>& fallbackMaterial);
 		static void Submit(const RenderSubmission& submission);
 		static void Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform);
+		static void RecordWorldSurfaceStats(uint32_t totalSurfaces, uint32_t visibleSurfaces);
 		static const RenderStats& GetStats();
 
 	private: 

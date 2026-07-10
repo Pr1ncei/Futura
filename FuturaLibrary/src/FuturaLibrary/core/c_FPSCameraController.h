@@ -5,6 +5,8 @@
 #include "FuturaLibrary/events/e_KeyEvent.h"
 #include "FuturaLibrary/events/e_MouseEvent.h"
 
+#include <functional>
+
 namespace FuturaLibrary
 {
 	class FT_API FPSCameraController
@@ -14,6 +16,7 @@ namespace FuturaLibrary
 
 		void OnUpdate(float deltaTime);
 		void OnEvent(Event& event);
+		void SetMovementResolver(const std::function<glm::vec3(const glm::vec3&, const glm::vec3&)>& resolver);
 
 		PerspectiveCamera& GetCamera() { return m_Camera; }
 		const PerspectiveCamera& GetCamera() const { return m_Camera; }
@@ -38,5 +41,6 @@ namespace FuturaLibrary
 		bool m_MoveBackward = false;
 		bool m_MoveLeft = false;
 		bool m_MoveRight = false;
+		std::function<glm::vec3(const glm::vec3&, const glm::vec3&)> m_MovementResolver;
 	};
 }

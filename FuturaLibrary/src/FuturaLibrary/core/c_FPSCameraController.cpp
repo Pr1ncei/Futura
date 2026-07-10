@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "c_FPSCameraController.h"
 
+#include <glm/gtx/norm.hpp>
+
 namespace FuturaLibrary
 {
 	namespace
@@ -19,18 +21,30 @@ namespace FuturaLibrary
 	void FPSCameraController::OnUpdate(float deltaTime)
 	{
 		const float velocity = m_MovementSpeed * deltaTime;
+		glm::vec3 desiredDelta = glm::vec3(0.0f);
 
 		if (m_MoveForward)
-			m_Camera.Move(m_Camera.GetFront() * velocity);
+			desiredDelta += m_Camera.GetFront() * velocity;
 
 		if (m_MoveBackward)
-			m_Camera.Move(-m_Camera.GetFront() * velocity);
+			desiredDelta += -m_Camera.GetFront() * velocity;
 
 		if (m_MoveLeft)
-			m_Camera.Move(-m_Camera.GetRight() * velocity);
+			desiredDelta += -m_Camera.GetRight() * velocity;
 
 		if (m_MoveRight)
-			m_Camera.Move(m_Camera.GetRight() * velocity);
+			desiredDelta += m_Camera.GetRight() * velocity;
+
+		if (glm::length2(desiredDelta) <= 0.0f)
+			return;
+
+		const glm::vec3 resolvedDelta = m_MovementResolver ? m_MovementResolver(m_Camera.GetPosition(), desiredDelta) : desiredDelta;
+		m_Camera.Move(resolvedDelta);
+	}
+
+	void FPSCameraController::SetMovementResolver(const std::function<glm::vec3(const glm::vec3&, const glm::vec3&)>& resolver)
+	{
+		m_MovementResolver = resolver;
 	}
 
 	void FPSCameraController::OnEvent(Event& event)

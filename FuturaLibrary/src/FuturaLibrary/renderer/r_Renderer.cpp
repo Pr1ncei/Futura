@@ -14,6 +14,8 @@
 #include "pch.h"
 #include "r_Renderer.h"
 
+#include "FuturaLibrary/renderer/r_StaticWorldRenderer.h"
+
 namespace FuturaLibrary
 {
 	Renderer::SceneData* Renderer::m_SceneData = nullptr;
@@ -89,9 +91,22 @@ namespace FuturaLibrary
 		Submit(submission.Material->GetShader(), submission.Mesh->GetVertexArray(), submission.Transform);
 	}
 
+	void Renderer::Submit(const Ref<StaticWorld>& world, const Ref<Material>& fallbackMaterial)
+	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
+		StaticWorldRenderer::Submit(world, fallbackMaterial, m_SceneData->ViewProjectionMatrix);
+	}
+
 	void Renderer::Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform)
 	{
 		Submit({ material, mesh, transform });
+	}
+
+	void Renderer::RecordWorldSurfaceStats(uint32_t totalSurfaces, uint32_t visibleSurfaces)
+	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
+		m_SceneData->Stats.TotalSurfaces += totalSurfaces;
+		m_SceneData->Stats.CulledSurfaces += totalSurfaces - visibleSurfaces;
 	}
 
 	const RenderStats& Renderer::GetStats()

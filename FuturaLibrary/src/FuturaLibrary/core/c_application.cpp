@@ -6,6 +6,7 @@
 #include "c_application.h"
 
 #include "FuturaLibrary/events/e_EventJournal.h"
+#include "FuturaLibrary/renderer/r_ImGuiRenderer.h"
 #include "FuturaLibrary/resources/r_ResourceManager.h"
 #include "FuturaLibrary/utils/u_eventlog.h"
 #include <GLFW/glfw3.h>
@@ -46,9 +47,14 @@ namespace FuturaLibrary
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         ResourceManager::Initialize(m_AssetRoot);
+        ImGuiRenderer::Initialize(*m_Window);
     }
 
-    Application::~Application() { FT_PROFILE_FUNCTION; }
+    Application::~Application()
+    {
+        FT_PROFILE_FUNCTION;
+        ImGuiRenderer::Shutdown();
+    }
 
     void Application::Run()
     {
@@ -62,6 +68,11 @@ namespace FuturaLibrary
                 layer->OnUpdate();
                 layer->OnRender();
             }
+
+            ImGuiRenderer::BeginFrame();
+            for (Layer* layer : m_LayerStack)
+                layer->OnImGuiRender();
+            ImGuiRenderer::EndFrame();
 
             m_EventJournal->DispatchPlaybackEvents([this](Event& event)
             {
