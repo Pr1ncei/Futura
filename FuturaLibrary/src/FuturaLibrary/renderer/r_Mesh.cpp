@@ -62,6 +62,8 @@ namespace FuturaLibrary
 		FT_CORE_ASSERT(!vertices.empty(), "Mesh requires vertices!");
 		FT_CORE_ASSERT(!indices.empty(), "Mesh requires indices!");
 
+		m_Vertices = vertices;
+		m_Indices = indices;
 		m_VertexArray = CreateRef<VertexArray>();
 
 		auto vertexBuffer = CreateRef<VertexBuffer>(

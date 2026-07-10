@@ -16,6 +16,9 @@
 
 #include "FuturaLibrary/core/c_FPSCameraController.h"
 #include "FuturaLibrary/core/c_Layer.h"
+#include "FuturaLibrary/events/e_KeyEvent.h"
+#include "FuturaLibrary/renderer/r_DebugOverlay.h"
+#include "FuturaLibrary/renderer/r_DebugRenderer.h"
 #include "FuturaLibrary/renderer/r_Material.h"
 
 #include "SceneWorld.h"
@@ -29,12 +32,17 @@ public:
 	void OnAttach() override;
 	void OnUpdate() override;
 	void OnRender() override;
+	void OnImGuiRender() override;
 	void OnEvent(FuturaLibrary::Event& event) override;
 
 private:
+	bool OnKeyPressed(FuturaLibrary::KeyPressedEvent& event);
+
 	FuturaLibrary::Ref<FuturaLibrary::Material> m_DefaultMaterial;
 	SceneWorld m_SceneWorld;
 	FuturaLibrary::FPSCameraController m_CameraController;
+	FuturaLibrary::DebugOverlayState m_DebugOverlayState;
+	FuturaLibrary::DebugOverlayFrameData m_DebugOverlayFrameData;
 	float m_LastFrameTime = 0.0f;
 	float m_FPSUpdateTimer = 0.0f;
 	uint32_t m_FrameCounter = 0;

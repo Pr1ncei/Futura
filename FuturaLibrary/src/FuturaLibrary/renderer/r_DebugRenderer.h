@@ -14,13 +14,26 @@
 #include "FuturaLibrary/graphics/g_Shader.h"
 #include <glm/glm.hpp>
 
+#include <limits>
+
 namespace FuturaLibrary
 {
+	class StaticWorld;
+
 	struct DebugDrawStats
 	{
 		uint32_t LineCount = 0;
 		uint32_t VertexCount = 0;
 		uint32_t FlushCount = 0;
+	};
+
+	struct DebugWorldDrawSettings
+	{
+		bool DrawBounds = false;
+		bool DrawPlanes = false;
+		bool DrawFrustum = false;
+		uint32_t SelectedSurfaceIndex = (std::numeric_limits<uint32_t>::max)();
+		glm::mat4 InverseViewProjection = glm::mat4(1.0f);
 	};
 
 	class FT_API DebugRenderer
@@ -37,6 +50,7 @@ namespace FuturaLibrary
 		static void DrawBox(const glm::vec3& center, const glm::vec3& halfExtents, const glm::vec4& color);
 		static void DrawPlane(const glm::vec3& center, const glm::vec3& normal, float halfExtent, const glm::vec4& color);
 		static void DrawFrustum(const glm::mat4& inverseViewProjection, const glm::vec4& color);
+		static void DrawStaticWorld(const StaticWorld& world, const DebugWorldDrawSettings& settings);
 
 		static const DebugDrawStats& GetStats();
 		static bool IsInitialized();

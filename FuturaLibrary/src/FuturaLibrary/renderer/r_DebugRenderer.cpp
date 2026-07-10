@@ -14,6 +14,7 @@
 #include "FuturaLibrary/graphics/g_Buffer.h"
 #include "FuturaLibrary/graphics/g_VertexArray.h"
 #include "FuturaLibrary/renderer/r_RenderCommand.h"
+#include "FuturaLibrary/resources/r_StaticWorld.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
 
@@ -179,6 +180,37 @@ namespace FuturaLibrary
 
 		for (uint32_t i = 0; i < 24; i += 2)
 			DrawLine(corners[edges[i]], corners[edges[i + 1]], color);
+	}
+
+	void DebugRenderer::DrawStaticWorld(const StaticWorld& world, const DebugWorldDrawSettings& settings)
+	{
+		if (settings.DrawBounds)
+		{
+			const AxisAlignedBounds& worldBounds = world.GetWorldBounds();
+			if (worldBounds.IsValid)
+				DrawAABB(worldBounds.Min, worldBounds.Max, glm::vec4(0.1f, 0.75f, 1.0f, 1.0f));
+
+			const std::vector<WorldSurface>& surfaces = world.GetSurfaces();
+			for (uint32_t i = 0; i < surfaces.size(); i++)
+			{
+				const WorldSurface& surface = surfaces[i];
+				if (!surface.WorldBounds.IsValid)
+					continue;
+
+				const bool selected = i == settings.SelectedSurfaceIndex;
+				const glm::vec4 color = selected ? glm::vec4(1.0f, 0.9f, 0.1f, 1.0f) : glm::vec4(0.25f, 1.0f, 0.35f, 0.85f);
+				DrawAABB(surface.WorldBounds.Min, surface.WorldBounds.Max, color);
+			}
+		}
+
+		if (settings.DrawPlanes)
+		{
+			for (const WorldPlane& plane : world.GetPlanes())
+				DrawPlane(plane.Center, plane.Normal, plane.HalfExtent, glm::vec4(1.0f, 0.45f, 0.1f, 1.0f));
+		}
+
+		if (settings.DrawFrustum)
+			DrawFrustum(settings.InverseViewProjection, glm::vec4(1.0f, 0.2f, 0.95f, 1.0f));
 	}
 
 	const DebugDrawStats& DebugRenderer::GetStats()

@@ -37,6 +37,8 @@ namespace FuturaLibrary
 		Mesh(const MeshData& meshData);
 
 		const Ref<VertexArray>& GetVertexArray() const { return m_VertexArray; }
+		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+		const std::vector<uint32_t>& GetIndices() const { return m_Indices; }
 		const AxisAlignedBounds& GetLocalBounds() const { return m_LocalBounds; }
 		uint32_t GetIndexCount() const { return m_IndexCount; }
 		uint32_t GetTriangleCount() const { return m_IndexCount / 3; }
@@ -49,6 +51,8 @@ namespace FuturaLibrary
 		void InitializeBuffers(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 
 		Ref<VertexArray> m_VertexArray;
+		std::vector<Vertex> m_Vertices;
+		std::vector<uint32_t> m_Indices;
 		AxisAlignedBounds m_LocalBounds;
 		uint32_t m_IndexCount = 0;
 	};
