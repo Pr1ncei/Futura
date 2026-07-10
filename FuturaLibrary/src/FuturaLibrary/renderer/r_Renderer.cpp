@@ -8,13 +8,13 @@
  *
  *      @author:             Prince Pamintuan
  *      @date:               December 24, 2025
- *      Last Modified on:    July 01, 2026
+ *      Last Modified on:    July 05, 2026
  */
 
 #include "pch.h"
 #include "r_Renderer.h"
 
-#include <glad/glad.h>
+#include "FuturaLibrary/renderer/r_StaticWorldRenderer.h"
 
 namespace FuturaLibrary
 {
@@ -27,19 +27,26 @@ namespace FuturaLibrary
 
 		m_SceneData = new SceneData();
 
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		RenderState defaultState;
+		RenderCommand::SetDepthTest(defaultState.DepthTest);
+		RenderCommand::SetFaceCulling(defaultState.FaceCulling);
+		RenderCommand::SetCullFace(defaultState.CullFace);
 	}
 
-	void Renderer::SetClearColor(const glm::vec4& color)
+	void Renderer::BeginFrame(const RenderFrameState& frameState)
 	{
-		glClearColor(color.r, color.g, color.b, color.a);
-	}
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
 
-	void Renderer::Clear()
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		m_SceneData->Stats = {};
+
+		RenderCommand::SetDepthTest(frameState.State.DepthTest);
+		RenderCommand::SetFaceCulling(frameState.State.FaceCulling);
+		if (frameState.State.FaceCulling)
+			RenderCommand::SetCullFace(frameState.State.CullFace);
+		if (frameState.State.UseViewport)
+			RenderCommand::SetViewport(frameState.State.Viewport);
+
+		RenderCommand::Clear(frameState.Clear);
 	}
 
 	void Renderer::BeginScene(const glm::mat4& viewProjection)
@@ -66,19 +73,45 @@ namespace FuturaLibrary
 		shader->SetMat4("u_ViewProjection", m_SceneData->ViewProjectionMatrix);
 		shader->SetMat4("u_Model", transform);
 
-		vertexArray->Bind();
+		RenderCommand::DrawIndexed(vertexArray);
+		m_SceneData->Stats.DrawCalls++;
+	}
 
-		const Ref<IndexBuffer>& indexBuffer = vertexArray->GetIndexBuffer();
-		FT_CORE_ASSERT(indexBuffer, "Renderer::Submit currently requires an index buffer!");
-		glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+	void Renderer::Submit(const RenderSubmission& submission)
+	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
+		FT_CORE_ASSERT(submission.Material, "Renderer::Submit received a null material!");
+		FT_CORE_ASSERT(submission.Mesh, "Renderer::Submit received a null mesh!");
+
+		m_SceneData->Stats.SubmittedMeshes++;
+		m_SceneData->Stats.Triangles += submission.Mesh->GetTriangleCount();
+		m_SceneData->Stats.VisibleSurfaces++;
+
+		submission.Material->Bind();
+		Submit(submission.Material->GetShader(), submission.Mesh->GetVertexArray(), submission.Transform);
+	}
+
+	void Renderer::Submit(const Ref<StaticWorld>& world, const Ref<Material>& fallbackMaterial)
+	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
+		StaticWorldRenderer::Submit(world, fallbackMaterial, m_SceneData->ViewProjectionMatrix);
 	}
 
 	void Renderer::Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform)
 	{
-		FT_CORE_ASSERT(material, "Renderer::Submit received a null material!");
-		FT_CORE_ASSERT(mesh, "Renderer::Submit received a null mesh!");
+		Submit({ material, mesh, transform });
+	}
 
-		material->Bind();
-		Submit(material->GetShader(), mesh->GetVertexArray(), transform);
+	void Renderer::RecordWorldSurfaceStats(uint32_t totalSurfaces, uint32_t visibleSurfaces)
+	{
+		FT_CORE_ASSERT(m_SceneData, "Renderer has not been initialized!");
+		m_SceneData->Stats.TotalSurfaces += totalSurfaces;
+		m_SceneData->Stats.CulledSurfaces += totalSurfaces - visibleSurfaces;
+	}
+
+	const RenderStats& Renderer::GetStats()
+	{
+		static RenderStats emptyStats;
+		return m_SceneData ? m_SceneData->Stats : emptyStats;
 	}
 }

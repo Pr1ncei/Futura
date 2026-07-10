@@ -14,9 +14,10 @@ The project is not yet a complete game. It is currently focused on rebuilding th
 - Renderer abstraction
 - Texture handling
 - FPS camera/input
+- Static world geometry and collision acceleration
 - Future BSP-style world rendering
 
-The most important development goal right now is to restore a working vertical slice: create a window, initialize OpenGL, update the application loop, draw a textured 3D object, and route that through the new engine structure.
+The most important development goal right now is to prepare the static world path for BSP work without starting BSP-specific loading yet.
 
 ## Project Layout
 
@@ -64,6 +65,7 @@ Recommended next steps:
 4. Keep the renderer abstraction small until the basic scene works again.
 5. Finish the texture wrapper after the basic render path is stable.
 6. Start static brush/world geometry before BSP loading.
+7. Keep the current static-world acceleration grid collision-first, then reuse the same world-query boundary for visibility/culling when renderer profiling requires it.
 
 Avoid adding BSP, multiplayer, entity systems, or large renderer abstractions until a basic textured 3D scene works through the refactored architecture.
 
@@ -103,13 +105,15 @@ Prefer explicit namespaces in source code. Avoid `using namespace ...` in projec
 
 ```text
 Phase 1: Rendering pipeline + FPS controls
-Phase 2: Managers and renderer abstraction
-Phase 3: BSP world system: rendering, collision, PVS
-Phase 4: GoldSrc-style entity system
-Phase 5: FPS gameplay: weapons, health, game rules
-Phase 6: Multiplayer architecture
-Phase 7: Multiplayer gameplay
-Phase 8: Optimization and polish
+Phase 2: Runtime foundation, event flow, renderer/resource cleanup
+Phase 3: Static world geometry + collision prototype
+Phase 4: BSP world system: rendering, collision, PVS
+Phase 5: Entity System + map/gameplay scripting foundation
+Phase 6: FPS gameplay: weapons, health, teams, rounds, damage
+Phase 7: Network-ready simulation architecture
+Phase 8: Multiplayer implementation
+Phase 9: Multiplayer gameplay polish
+Phase 10: Optimization, tools, and content pipeline
 ```
 
-This roadmap is flexible. The immediate priority is Phase 2 stabilization, not feature expansion.
+This roadmap is flexible. Phase 3 now has a static world path with collision queries accelerated by a simple hashed grid; BSP loading/traversal remains Phase 4.

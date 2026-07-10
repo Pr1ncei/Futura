@@ -23,6 +23,27 @@
 
 namespace FuturaLibrary
 {
+	namespace
+	{
+#ifdef FT_DEBUG
+		void APIENTRY OpenGLDebugMessageCallback(
+			GLenum source,
+			GLenum type,
+			GLuint id,
+			GLenum severity,
+			GLsizei length,
+			const GLchar* message,
+			const void* userParam
+		)
+		{
+			if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+				return;
+
+			FT_CORE_ERROR("OpenGL debug message [{0}] source={1} type={2} severity={3}: {4}", id, source, type, severity, message);
+		}
+#endif
+	}
+
 	class GLFWWindow : public Window
 	{
 	public:
@@ -78,6 +99,12 @@ namespace FuturaLibrary
 			);
 		}
 
+		void SetTitle(const std::string& title) override
+		{
+			m_Data.Title = title;
+			glfwSetWindowTitle(m_Window, m_Data.Title.c_str());
+		}
+
 		bool IsVSync() const override { return m_Data.VSync; }
 		double GetTime() const override { return glfwGetTime(); }
 		void* GetNativeWindow() const override { return m_Window; }
@@ -128,6 +155,18 @@ namespace FuturaLibrary
 
 			int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 			FT_CORE_ASSERT(status, "Could not initialize GLAD!");
+
+#ifdef FT_DEBUG
+			GLint contextFlags = 0;
+			glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);
+			if ((contextFlags & GL_CONTEXT_FLAG_DEBUG_BIT) != 0)
+			{
+				glEnable(GL_DEBUG_OUTPUT);
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				glDebugMessageCallback(OpenGLDebugMessageCallback, nullptr);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+			}
+#endif
 
 			glViewport(0, 0, static_cast<int>(m_Data.Width), static_cast<int>(m_Data.Height));
 			SetVSync(true);

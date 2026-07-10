@@ -9,5 +9,6 @@ namespace FuturaLibrary
 	void Layer::OnDetach() {}
 	void Layer::OnUpdate() {}
 	void Layer::OnRender() {}
+	void Layer::OnImGuiRender() {}
 	void Layer::OnEvent(Event& event) {}
 }

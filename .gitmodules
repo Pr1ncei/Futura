@@ -7,3 +7,6 @@
 [submodule "FuturaLibrary/vendor/glm"]
 	path = FuturaLibrary/vendor/glm
 	url = https://github.com/helpfulprojects/glm.git
+[submodule "FuturaLibrary/vendor/imgui"]
+	path = FuturaLibrary/vendor/imgui
+	url = https://github.com/ocornut/imgui.git

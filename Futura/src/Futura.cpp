@@ -27,7 +27,7 @@
 class Futura : public FuturaLibrary::Application
 {
 public:
-    Futura(const std::string& assetRoot) : FuturaLibrary::Application(assetRoot)
+    Futura(const FuturaLibrary::ApplicationConfig& config) : FuturaLibrary::Application(config)
     {
         PushLayer<GameLayer>();
     }
@@ -36,5 +36,13 @@ public:
 
 std::unique_ptr<FuturaLibrary::Application> FuturaLibrary::CreateApplication(const std::string& assetRoot)
 {
-    return std::make_unique<Futura>(assetRoot);
+    FuturaLibrary::ApplicationConfig config;
+    config.AssetRoot = assetRoot;
+
+    // ENABLES EVENT JOURNAL FOR DEBUGGING
+    config.JournalMode = FuturaLibrary::EventJournalMode::Off;
+    config.JournalPath = "event_journal.ftj";
+    config.AllowEnvironmentJournalOverride = true;
+
+    return std::make_unique<Futura>(config);
 }

@@ -6,28 +6,59 @@
 #include "FuturaLibrary/graphics/g_VertexArray.h"
 #include "FuturaLibrary/renderer/r_Material.h"
 #include "FuturaLibrary/renderer/r_Mesh.h"
+#include "FuturaLibrary/renderer/r_RenderCommand.h"
 #include <glm/glm.hpp>
 
 namespace FuturaLibrary
 {
+	class StaticWorld;
+
+	struct RenderFrameState
+	{
+		RenderClearState Clear;
+		RenderState State;
+	};
+
+	struct RenderSubmission
+	{
+		Ref<Material> Material;
+		Ref<Mesh> Mesh;
+		glm::mat4 Transform = glm::mat4(1.0f);
+	};
+
+	struct RenderStats
+	{
+		uint32_t DrawCalls = 0;
+		uint32_t SubmittedMeshes = 0;
+		uint32_t Triangles = 0;
+		uint32_t VisibleSurfaces = 0;
+		uint32_t TotalSurfaces = 0;
+		uint32_t CulledSurfaces = 0;
+	};
+
 	class FT_API Renderer
 	{
 	public: 
 		static void Initialize(); 
-		static void SetClearColor(const glm::vec4& color);
-		static void Clear();
+		static void BeginFrame(const RenderFrameState& frameState);
 		static void BeginScene(const glm::mat4& viewProjection);
 		static void EndScene(); 
-		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform); 
+		static void Submit(const Ref<StaticWorld>& world, const Ref<Material>& fallbackMaterial);
+		static void Submit(const RenderSubmission& submission);
 		static void Submit(const Ref<Material>& material, const Ref<Mesh>& mesh, const glm::mat4& transform);
+		static void RecordWorldSurfaceStats(uint32_t totalSurfaces, uint32_t visibleSurfaces);
+		static const RenderStats& GetStats();
 
 	private: 
 		struct SceneData
 		{
 			glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
+			RenderStats Stats;
 		};
 
 		static SceneData* m_SceneData; 
+
+		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform); 
 
 
 		class WorldRenderer; 

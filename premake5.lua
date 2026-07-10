@@ -36,13 +36,24 @@ project "FuturaLibrary"
     "%{prj.name}/vendor/GLAD/src/glad.c",
 
     -- stb_image implementation
-    "%{prj.name}/vendor/stb_image/stb_image.cpp"
+    "%{prj.name}/vendor/stb_image/stb_image.cpp",
+
+    -- Dear ImGui
+    "%{prj.name}/vendor/imgui/imgui.cpp",
+    "%{prj.name}/vendor/imgui/imgui_draw.cpp",
+    "%{prj.name}/vendor/imgui/imgui_tables.cpp",
+    "%{prj.name}/vendor/imgui/imgui_widgets.cpp",
+    "%{prj.name}/vendor/imgui/backends/imgui_impl_glfw.cpp",
+    "%{prj.name}/vendor/imgui/backends/imgui_impl_opengl3.cpp"
   }
 
   filter "files:**/glad.c"
     flags { "NoPCH" }
 
   filter "files:**/stb_image.cpp"
+    flags { "NoPCH" }
+
+  filter "files:**/imgui*.cpp"
     flags { "NoPCH" }
 
   filter {}
@@ -55,7 +66,11 @@ project "FuturaLibrary"
     "%{prj.name}/vendor/GLAD/include",
     "%{prj.name}/vendor/GLFW/include",
     "%{prj.name}/vendor/glm",
-    "%{prj.name}/vendor/stb_image"
+    "%{prj.name}/vendor/stb_image",
+    "%{prj.name}/vendor/imgui",
+    "%{prj.name}/vendor/imgui/backends",
+
+    "F:/Development/vcpkg/installed/x64-windows/include"
   }
 
   defines
@@ -64,7 +79,7 @@ project "FuturaLibrary"
   }
 
   filter "system:windows"
-    toolset "v143"
+    toolset "v145"
     cppdialect "C++20"
     staticruntime "Off"
     systemversion "latest"
@@ -72,23 +87,32 @@ project "FuturaLibrary"
     defines
     {
       "FT_PLATFORM_WINDOWS",
-      "FT_BUILD_DLL"
+      "FT_BUILD_DLL",
+      "FT_ENABLE_ASSIMP"
     }
 
     links
     {
       "glfw3",
-      "opengl32"
+      "opengl32",
+      "assimp-vc145-mt"
     }
 
     libdirs
     {
-      "%{prj.name}/vendor/GLFW/lib"
+      "%{prj.name}/vendor/GLFW/lib",
+      "F:/Development/vcpkg/installed/x64-windows/lib"
     }
 
     postbuildcommands
     {
-      "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Futura"
+      "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/assimp-vc145-mt.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/kubazip.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/minizip.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/poly2tri.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/pugixml.dll ../bin/" .. outputdir .. "/Futura",
+      "{COPYFILE} F:/Development/vcpkg/installed/x64-windows/bin/z.dll ../bin/" .. outputdir .. "/Futura"
 
       -- "{COPYDIR} ../Futura/assets %{cfg.targetdir}/assets"
     }
@@ -138,7 +162,13 @@ project "Futura"
   files
   {
     "%{prj.name}/src/**.h",
-    "%{prj.name}/src/**.cpp"
+    "%{prj.name}/src/**.cpp",
+    "%{prj.name}/assets/scenes/**.scene"
+  }
+
+  removefiles
+  {
+    "%{prj.name}/assets/**.obj"
   }
 
   includedirs
@@ -157,7 +187,7 @@ project "Futura"
   }
 
   filter "system:windows"
-    toolset "v143"
+    toolset "v145"
     cppdialect "C++20"
     staticruntime "Off"
     systemversion "latest"
