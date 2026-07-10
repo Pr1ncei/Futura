@@ -17,7 +17,6 @@
 
 #include <fstream>
 #include <chrono>
-#include <limits>
 #include <sstream>
 #include <unordered_map>
 
@@ -135,36 +134,13 @@ void SceneWorld::Submit(const FuturaLibrary::Ref<FuturaLibrary::Material>& fallb
 
 void SceneWorld::DrawDebug(const FuturaLibrary::DebugWorldDrawSettings& settings) const
 {
-	uint32_t surfaceOffset = 0;
 	for (const FuturaLibrary::Ref<FuturaLibrary::StaticWorld>& world : m_StaticWorlds)
 	{
 		if (!world)
 			continue;
 
-		FuturaLibrary::DebugWorldDrawSettings worldSettings = settings;
-		const uint32_t surfaceCount = static_cast<uint32_t>(world->GetSurfaces().size());
-		if (m_SelectedSurfaceIndex >= surfaceOffset && m_SelectedSurfaceIndex < surfaceOffset + surfaceCount)
-			worldSettings.SelectedSurfaceIndex = m_SelectedSurfaceIndex - surfaceOffset;
-		else
-			worldSettings.SelectedSurfaceIndex = std::numeric_limits<uint32_t>::max();
-
-		FuturaLibrary::DebugRenderer::DrawStaticWorld(*world, worldSettings);
-		surfaceOffset += surfaceCount;
+		FuturaLibrary::DebugRenderer::DrawStaticWorld(*world, settings);
 	}
-}
-
-void SceneWorld::SelectNextSurface()
-{
-	const uint32_t surfaceCount = GetSurfaceCount();
-	if (surfaceCount == 0)
-	{
-		FT_CORE_WARN("No world surfaces are available for debug selection.");
-		m_SelectedSurfaceIndex = 0;
-		return;
-	}
-
-	m_SelectedSurfaceIndex = (m_SelectedSurfaceIndex + 1) % surfaceCount;
-	FT_CORE_INFO("Selected debug world surface {0}/{1}. Enable F1 bounds to see the highlighted surface.", m_SelectedSurfaceIndex + 1, surfaceCount);
 }
 
 FuturaLibrary::WorldRaycastHit SceneWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance) const
@@ -209,25 +185,22 @@ glm::vec3 SceneWorld::ResolveCameraMovement(const glm::vec3& cameraPosition, con
 	return resolvedDelta;
 }
 
-bool SceneWorld::HasPlanes() const
+FuturaLibrary::WorldAccelerationStats SceneWorld::GetAccelerationStats() const
 {
+	FuturaLibrary::WorldAccelerationStats stats;
 	for (const FuturaLibrary::Ref<FuturaLibrary::StaticWorld>& world : m_StaticWorlds)
 	{
-		if (world && !world->GetPlanes().empty())
-			return true;
+		if (!world)
+			continue;
+
+		const FuturaLibrary::WorldAccelerationStats& worldStats = world->GetAccelerationStats();
+		if (stats.CellSize == 0.0f)
+			stats.CellSize = worldStats.CellSize;
+
+		stats.OccupiedCells += worldStats.OccupiedCells;
+		stats.IndexedSurfaces += worldStats.IndexedSurfaces;
+		stats.IndexedTriangles += worldStats.IndexedTriangles;
 	}
 
-	return false;
-}
-
-uint32_t SceneWorld::GetSurfaceCount() const
-{
-	uint32_t surfaceCount = 0;
-	for (const FuturaLibrary::Ref<FuturaLibrary::StaticWorld>& world : m_StaticWorlds)
-	{
-		if (world)
-			surfaceCount += static_cast<uint32_t>(world->GetSurfaces().size());
-	}
-
-	return surfaceCount;
+	return stats;
 }

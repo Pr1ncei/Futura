@@ -47,14 +47,6 @@ namespace FuturaLibrary
 		AxisAlignedBounds WorldBounds;
 	};
 
-	struct WorldPlane
-	{
-		glm::vec3 Center = glm::vec3(0.0f);
-		glm::vec3 Normal = glm::vec3(0.0f, 1.0f, 0.0f);
-		float HalfExtent = 1.0f;
-		uint32_t SourceSurfaceIndex = 0;
-	};
-
 	struct WorldTriangle
 	{
 		glm::vec3 A = glm::vec3(0.0f);
@@ -84,6 +76,14 @@ namespace FuturaLibrary
 		uint32_t ContactsGenerated = 0;
 	};
 
+	struct WorldAccelerationStats
+	{
+		float CellSize = 0.0f;
+		uint32_t OccupiedCells = 0;
+		uint32_t IndexedSurfaces = 0;
+		uint32_t IndexedTriangles = 0;
+	};
+
 	class FT_API StaticWorld
 	{
 	public:
@@ -96,36 +96,43 @@ namespace FuturaLibrary
 		const WorldTransform& GetTransform() const { return m_Transform; }
 		const std::vector<WorldSurface>& GetSurfaces() const { return m_Surfaces; }
 		const std::vector<WorldMaterialRef>& GetMaterials() const { return m_Materials; }
-		const std::vector<WorldPlane>& GetPlanes() const { return m_Planes; }
 		const std::vector<WorldTriangle>& GetCollisionTriangles() const { return m_CollisionTriangles; }
 		const AxisAlignedBounds& GetLocalBounds() const { return m_LocalBounds; }
 		const AxisAlignedBounds& GetWorldBounds() const { return m_WorldBounds; }
+		const WorldAccelerationStats& GetAccelerationStats() const { return m_AccelerationStats; }
 		bool IsEmpty() const { return m_Surfaces.empty(); }
 		bool HasCollisionMesh() const { return !m_CollisionTriangles.empty(); }
 
 		WorldRaycastHit Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance) const;
 		glm::vec3 ResolveAABBMovement(const glm::vec3& center, const glm::vec3& halfExtents, const glm::vec3& desiredDelta, CollisionQueryStats* stats = nullptr) const;
+		void QuerySurfaces(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates) const;
 
 		static Ref<StaticWorld> CreateFromModel(const Ref<Model>& model, const WorldTransform& transform = {});
 
 	private:
+		struct SpatialCell
+		{
+			std::vector<uint32_t> Surfaces;
+			std::vector<uint32_t> CollisionTriangles;
+		};
+
 		void ExtractCollisionTriangles(const WorldSurface& surface);
-		void BuildCollisionGrid();
-		void QueryCollisionGrid(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates, CollisionQueryStats* stats = nullptr) const;
+		void BuildSpatialGrid();
+		void QueryCollisionTriangles(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates, CollisionQueryStats* stats = nullptr) const;
 
 		std::string m_SourceName;
 		WorldTransform m_Transform;
 		std::vector<WorldSurface> m_Surfaces;
 		std::vector<WorldMaterialRef> m_Materials;
-		std::vector<WorldPlane> m_Planes;
 		std::vector<WorldTriangle> m_CollisionTriangles;
-		std::unordered_map<int64_t, std::vector<uint32_t>> m_CollisionGrid;
+		std::unordered_map<int64_t, SpatialCell> m_SpatialGrid;
 		mutable std::vector<uint32_t> m_CollisionQueryCandidates;
 		mutable std::vector<uint32_t> m_CollisionQueryMarks;
 		mutable std::vector<uint32_t> m_SurfaceQueryMarks;
 		mutable uint32_t m_CollisionQueryStamp = 1;
 		mutable uint32_t m_SurfaceQueryStamp = 1;
-		float m_CollisionGridCellSize = 8.0f;
+		float m_SpatialGridCellSize = 8.0f;
+		WorldAccelerationStats m_AccelerationStats;
 		AxisAlignedBounds m_LocalBounds;
 		AxisAlignedBounds m_WorldBounds;
 	};

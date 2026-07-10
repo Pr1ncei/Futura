@@ -1,8 +1,8 @@
 # Current Progress
 
-The project is currently in Phase 2: managers and renderer abstraction.
+The project is currently finishing Phase 3: static world geometry and collision preparation for BSP.
 
-This phase is unfinished. Several parts were moved toward an engine-style architecture, but the old working render loop has not yet been fully restored inside that architecture.
+Phase 2's runtime and rendering foundation now has enough structure to load a preview static world, render its surfaces, move an FPS camera, and run collision queries through engine-owned world data.
 
 ## What Exists
 
@@ -20,8 +20,10 @@ The current codebase contains:
 - shader wrapper
 - buffer wrappers
 - vertex array wrapper
-- partial texture work
-- placeholder renderer classes
+- texture handling
+- static world renderer path
+- static world collision acceleration
+- debug overlays for renderer, collision, and acceleration stats
 - OpenGL debug logging utility
 
 ## What Previously Worked
@@ -39,6 +41,27 @@ Older commits had:
 - scroll-based camera zoom
 
 Those pieces are the reference behavior to restore.
+
+## Phase 3: Static World Geometry and Collision
+
+Goal: make static geometry usable before adding BSP loading, BSP traversal, or PVS.
+
+Implemented:
+
+- load preview static-world geometry from imported model surfaces
+- keep static world data in `FuturaLibrary` instead of game/client code
+- extract world-space collision triangles from static surfaces
+- build a hashed uniform grid over static world cells
+- use the grid as the collision broad phase for raycasts and camera AABB movement
+- track broad-phase candidate counts and collision timings in the debug overlay
+- expose surface candidates from the same grid boundary for later renderer visibility work
+
+Intentionally deferred:
+
+- BSP lump loading
+- BSP tree traversal
+- PVS/leaf visibility
+- replacing renderer surface iteration with spatial traversal before profiling requires it
 
 ## Phase 2 Sub-Phases
 
@@ -154,11 +177,9 @@ Acceptance criteria:
 
 Important unfinished areas:
 
-- layer update/render integration
-- resource managers
-- refactored cube/camera test scene
-- world renderer
 - BSP system
+- BSP visibility/PVS
+- proper player physics body state
 - entity system
 - gameplay
 - multiplayer
@@ -167,14 +188,13 @@ Important unfinished areas:
 
 These are the main areas to inspect before adding features:
 
-- layer update/render integration still needs a real game layer
-- resource managers are not implemented yet
-- `WorldRenderer` is still a placeholder
+- keep static-world acceleration collision-first until renderer profiling justifies spatial visibility traversal
+- keep camera collision separate from future player physics body state
 - Some old `BUKAS` namespace references remain in graphics logging.
 
 ## Recommended Next Milestone
 
-Restore this minimum working engine path:
+Start BSP world work on top of the current static-world path:
 
 ```text
 Futura main
@@ -184,9 +204,11 @@ Futura main
   -> GLAD initialized
   -> LayerStack
   -> GameLayer
-  -> Shader + VertexArray + Texture
-  -> Draw cube
+  -> StaticWorld
+  -> Static world acceleration grid
+  -> Collision queries
+  -> Static world rendering
   -> Swap buffers and poll events
 ```
 
-That milestone should be completed before BSP or gameplay work resumes.
+The next BSP milestone should add loading/traversal without replacing the working app, renderer, camera, and collision loop.

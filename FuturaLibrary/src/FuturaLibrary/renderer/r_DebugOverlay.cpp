@@ -15,7 +15,7 @@
 
 namespace FuturaLibrary
 {
-	void DebugOverlay::Draw(DebugOverlayState& state, const DebugOverlayFrameData& frameData, const std::function<void()>& selectNextSurface)
+	void DebugOverlay::Draw(DebugOverlayState& state, const DebugOverlayFrameData& frameData)
 	{
 		if (!state.ShowStats)
 			return;
@@ -36,6 +36,12 @@ namespace FuturaLibrary
 		ImGui::Text("Surfaces: %u visible / %u total", frameData.Render.VisibleSurfaces, frameData.Render.TotalSurfaces);
 		ImGui::Text("Culled Surfaces: %u", frameData.Render.CulledSurfaces);
 
+		ImGui::SeparatorText("World Acceleration");
+		ImGui::Text("Grid Cell Size: %.2f", frameData.Acceleration.CellSize);
+		ImGui::Text("Occupied Cells: %u", frameData.Acceleration.OccupiedCells);
+		ImGui::Text("Indexed Surfaces: %u", frameData.Acceleration.IndexedSurfaces);
+		ImGui::Text("Indexed Triangles: %u", frameData.Acceleration.IndexedTriangles);
+
 		ImGui::SeparatorText("Debug Draw");
 		ImGui::Text("Lines: %u", frameData.DebugDraw.LineCount);
 		ImGui::Text("Vertices: %u", frameData.DebugDraw.VertexCount);
@@ -51,18 +57,6 @@ namespace FuturaLibrary
 
 		ImGui::SeparatorText("World Debug");
 		ImGui::Checkbox("Bounds (F1)", &state.DrawSettings.DrawBounds);
-
-		if (!frameData.HasPlanes)
-			ImGui::BeginDisabled();
-		ImGui::Checkbox("Plane Normals (F2)", &state.DrawSettings.DrawPlanes);
-		if (!frameData.HasPlanes)
-			ImGui::EndDisabled();
-
-		ImGui::Checkbox("Frustum (F3)", &state.DrawSettings.DrawFrustum);
-
-		ImGui::Text("Selected Surface: %u", frameData.SelectedSurfaceIndex);
-		if (ImGui::Button("Select Next Surface (F5)") && selectNextSurface)
-			selectNextSurface();
 
 		ImGui::End();
 	}

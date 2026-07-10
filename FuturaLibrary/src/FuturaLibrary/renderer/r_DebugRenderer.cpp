@@ -15,8 +15,6 @@
 #include "FuturaLibrary/graphics/g_VertexArray.h"
 #include "FuturaLibrary/renderer/r_RenderCommand.h"
 #include "FuturaLibrary/resources/r_StaticWorld.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/norm.hpp>
 
 namespace FuturaLibrary
 {
@@ -42,14 +40,6 @@ namespace FuturaLibrary
 
 		DebugRendererData* s_Data = nullptr;
 
-		glm::vec3 UnprojectFrustumCorner(const glm::mat4& inverseViewProjection, const glm::vec3& ndc)
-		{
-			glm::vec4 world = inverseViewProjection * glm::vec4(ndc, 1.0f);
-			if (world.w != 0.0f)
-				world /= world.w;
-
-			return glm::vec3(world);
-		}
 	}
 
 	void DebugRenderer::Initialize(const Ref<Shader>& shader, uint32_t maxLines)
@@ -138,50 +128,6 @@ namespace FuturaLibrary
 		DrawAABB(center - halfExtents, center + halfExtents, color);
 	}
 
-	void DebugRenderer::DrawPlane(const glm::vec3& center, const glm::vec3& normal, float halfExtent, const glm::vec4& color)
-	{
-		glm::vec3 planeNormal = glm::length2(normal) > 0.0f ? glm::normalize(normal) : glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 tangent = glm::abs(planeNormal.y) < 0.99f ? glm::cross(planeNormal, glm::vec3(0.0f, 1.0f, 0.0f)) : glm::cross(planeNormal, glm::vec3(1.0f, 0.0f, 0.0f));
-		tangent = glm::normalize(tangent);
-		glm::vec3 bitangent = glm::normalize(glm::cross(planeNormal, tangent));
-
-		glm::vec3 a = center + (tangent + bitangent) * halfExtent;
-		glm::vec3 b = center + (tangent - bitangent) * halfExtent;
-		glm::vec3 c = center + (-tangent - bitangent) * halfExtent;
-		glm::vec3 d = center + (-tangent + bitangent) * halfExtent;
-
-		DrawLine(a, b, color);
-		DrawLine(b, c, color);
-		DrawLine(c, d, color);
-		DrawLine(d, a, color);
-		DrawLine(center, center + planeNormal * halfExtent, glm::vec4(1.0f, 0.95f, 0.1f, color.a));
-	}
-
-	void DebugRenderer::DrawFrustum(const glm::mat4& inverseViewProjection, const glm::vec4& color)
-	{
-		const glm::vec3 corners[8] =
-		{
-			UnprojectFrustumCorner(inverseViewProjection, { -1.0f, -1.0f, -1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, {  1.0f, -1.0f, -1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, {  1.0f,  1.0f, -1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, { -1.0f,  1.0f, -1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, { -1.0f, -1.0f,  1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, {  1.0f, -1.0f,  1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, {  1.0f,  1.0f,  1.0f }),
-			UnprojectFrustumCorner(inverseViewProjection, { -1.0f,  1.0f,  1.0f })
-		};
-
-		const uint32_t edges[24] =
-		{
-			0, 1, 1, 2, 2, 3, 3, 0,
-			4, 5, 5, 6, 6, 7, 7, 4,
-			0, 4, 1, 5, 2, 6, 3, 7
-		};
-
-		for (uint32_t i = 0; i < 24; i += 2)
-			DrawLine(corners[edges[i]], corners[edges[i + 1]], color);
-	}
-
 	void DebugRenderer::DrawStaticWorld(const StaticWorld& world, const DebugWorldDrawSettings& settings)
 	{
 		if (settings.DrawBounds)
@@ -197,20 +143,9 @@ namespace FuturaLibrary
 				if (!surface.WorldBounds.IsValid)
 					continue;
 
-				const bool selected = i == settings.SelectedSurfaceIndex;
-				const glm::vec4 color = selected ? glm::vec4(1.0f, 0.9f, 0.1f, 1.0f) : glm::vec4(0.25f, 1.0f, 0.35f, 0.85f);
-				DrawAABB(surface.WorldBounds.Min, surface.WorldBounds.Max, color);
+				DrawAABB(surface.WorldBounds.Min, surface.WorldBounds.Max, glm::vec4(0.25f, 1.0f, 0.35f, 0.85f));
 			}
 		}
-
-		if (settings.DrawPlanes)
-		{
-			for (const WorldPlane& plane : world.GetPlanes())
-				DrawPlane(plane.Center, plane.Normal, plane.HalfExtent, glm::vec4(1.0f, 0.45f, 0.1f, 1.0f));
-		}
-
-		if (settings.DrawFrustum)
-			DrawFrustum(settings.InverseViewProjection, glm::vec4(1.0f, 0.2f, 0.95f, 1.0f));
 	}
 
 	const DebugDrawStats& DebugRenderer::GetStats()
