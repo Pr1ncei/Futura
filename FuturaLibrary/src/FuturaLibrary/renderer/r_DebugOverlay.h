@@ -15,8 +15,6 @@
 #include "FuturaLibrary/renderer/r_Renderer.h"
 #include "FuturaLibrary/resources/r_StaticWorld.h"
 
-#include <functional>
-
 namespace FuturaLibrary
 {
 	struct DebugOverlayState
@@ -32,13 +30,12 @@ namespace FuturaLibrary
 		RenderStats Render;
 		DebugDrawStats DebugDraw;
 		CollisionQueryStats Collision;
-		bool HasPlanes = false;
-		uint32_t SelectedSurfaceIndex = 0;
+		WorldAccelerationStats Acceleration;
 	};
 
 	class FT_API DebugOverlay
 	{
 	public:
-		static void Draw(DebugOverlayState& state, const DebugOverlayFrameData& frameData, const std::function<void()>& selectNextSurface);
+		static void Draw(DebugOverlayState& state, const DebugOverlayFrameData& frameData);
 	};
 }

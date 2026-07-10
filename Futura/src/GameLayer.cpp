@@ -25,9 +25,6 @@
 namespace
 {
 	constexpr int KeyF1 = 290; // Toggle world and surface bounds.
-	constexpr int KeyF2 = 291; // Toggle world plane normals when plane data exists.
-	constexpr int KeyF3 = 292; // Toggle camera frustum outline.
-	constexpr int KeyF5 = 294; // Select the next surface for bounds highlighting.
 	constexpr int KeyF6 = 295; // Toggle the in-game debug statistics overlay.
 }
 
@@ -94,7 +91,6 @@ void GameLayer::OnRender()
 	FuturaLibrary::Renderer::EndScene();
 
 	FuturaLibrary::DebugRenderer::BeginScene(viewProjection);
-	m_DebugOverlayState.DrawSettings.InverseViewProjection = glm::inverse(viewProjection);
 	m_SceneWorld.DrawDebug(m_DebugOverlayState.DrawSettings);
 	FuturaLibrary::DebugRenderer::EndScene();
 	FuturaLibrary::RenderCommand::CheckErrors("GameLayer::OnRender");
@@ -105,13 +101,8 @@ void GameLayer::OnImGuiRender()
 	m_DebugOverlayFrameData.Render = FuturaLibrary::Renderer::GetStats();
 	m_DebugOverlayFrameData.DebugDraw = FuturaLibrary::DebugRenderer::GetStats();
 	m_DebugOverlayFrameData.Collision = m_SceneWorld.GetCollisionStats();
-	m_DebugOverlayFrameData.HasPlanes = m_SceneWorld.HasPlanes();
-	m_DebugOverlayFrameData.SelectedSurfaceIndex = m_SceneWorld.GetSelectedSurfaceIndex();
-
-	FuturaLibrary::DebugOverlay::Draw(m_DebugOverlayState, m_DebugOverlayFrameData, [this]()
-	{
-		m_SceneWorld.SelectNextSurface();
-	});
+	m_DebugOverlayFrameData.Acceleration = m_SceneWorld.GetAccelerationStats();
+	FuturaLibrary::DebugOverlay::Draw(m_DebugOverlayState, m_DebugOverlayFrameData);
 }
 
 void GameLayer::OnEvent(FuturaLibrary::Event& event)
@@ -133,23 +124,6 @@ bool GameLayer::OnKeyPressed(FuturaLibrary::KeyPressedEvent& event)
 	{
 		case KeyF1:
 			m_DebugOverlayState.DrawSettings.DrawBounds = !m_DebugOverlayState.DrawSettings.DrawBounds;
-			return false;
-		case KeyF2:
-			if (!m_SceneWorld.HasPlanes())
-			{
-				FT_CORE_WARN("No world plane data is available yet. Plane debug will become visible after plane extraction is implemented.");
-				return false;
-			}
-
-			m_DebugOverlayState.DrawSettings.DrawPlanes = !m_DebugOverlayState.DrawSettings.DrawPlanes;
-			return false;
-		case KeyF3:
-			m_DebugOverlayState.DrawSettings.DrawFrustum = !m_DebugOverlayState.DrawSettings.DrawFrustum;
-			return false;
-		case KeyF5:
-			m_SceneWorld.SelectNextSurface();
-			if (!m_DebugOverlayState.DrawSettings.DrawBounds)
-				FT_CORE_INFO("Selected surface changed. Enable F1 bounds to see the highlighted surface.");
 			return false;
 		case KeyF6:
 			m_DebugOverlayState.ShowStats = !m_DebugOverlayState.ShowStats;

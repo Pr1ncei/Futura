@@ -1,0 +1,16 @@
+Futura/assets/**/*.obj filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.fbx filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.gltf filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.glb filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.tga filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.dds filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.ktx filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.ktx2 filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.hdr filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.exr filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.bsp filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.map filter=lfs diff=lfs merge=lfs -text
+Futura/assets/**/*.vmf filter=lfs diff=lfs merge=lfs -text

@@ -3,6 +3,7 @@
 
 #include <glm/gtx/norm.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -210,7 +211,7 @@ namespace FuturaLibrary
 			ExtractCollisionTriangles(m_Surfaces.back());
 		}
 
-		BuildCollisionGrid();
+		BuildSpatialGrid();
 	}
 
 	void StaticWorld::ExtractCollisionTriangles(const WorldSurface& surface)
@@ -249,15 +250,19 @@ namespace FuturaLibrary
 		}
 	}
 
-	void StaticWorld::BuildCollisionGrid()
+	void StaticWorld::BuildSpatialGrid()
 	{
-		m_CollisionGrid.clear();
+		m_SpatialGrid.clear();
 		m_CollisionQueryMarks.assign(m_CollisionTriangles.size(), 0);
 		m_SurfaceQueryMarks.assign(m_Surfaces.size(), 0);
 		m_CollisionQueryCandidates.clear();
 		m_CollisionQueryCandidates.reserve(512);
 		m_CollisionQueryStamp = 1;
 		m_SurfaceQueryStamp = 1;
+		m_AccelerationStats = {};
+		m_AccelerationStats.CellSize = m_SpatialGridCellSize;
+		m_AccelerationStats.IndexedSurfaces = static_cast<uint32_t>(m_Surfaces.size());
+		m_AccelerationStats.IndexedTriangles = static_cast<uint32_t>(m_CollisionTriangles.size());
 
 		if (m_CollisionTriangles.empty())
 			return;
@@ -265,31 +270,39 @@ namespace FuturaLibrary
 		for (uint32_t triangleIndex = 0; triangleIndex < m_CollisionTriangles.size(); triangleIndex++)
 		{
 			const WorldTriangle& triangle = m_CollisionTriangles[triangleIndex];
-			const GridCoord minCoord = ToGridCoord(triangle.Bounds.Min, m_CollisionGridCellSize);
-			const GridCoord maxCoord = ToGridCoord(triangle.Bounds.Max, m_CollisionGridCellSize);
+			const GridCoord minCoord = ToGridCoord(triangle.Bounds.Min, m_SpatialGridCellSize);
+			const GridCoord maxCoord = ToGridCoord(triangle.Bounds.Max, m_SpatialGridCellSize);
 
 			for (int32_t z = minCoord.Z; z <= maxCoord.Z; z++)
 			{
 				for (int32_t y = minCoord.Y; y <= maxCoord.Y; y++)
 				{
 					for (int32_t x = minCoord.X; x <= maxCoord.X; x++)
-						m_CollisionGrid[HashGridCoord({ x, y, z })].push_back(triangleIndex);
+					{
+						SpatialCell& cell = m_SpatialGrid[HashGridCoord({ x, y, z })];
+						cell.CollisionTriangles.push_back(triangleIndex);
+
+						if (std::find(cell.Surfaces.begin(), cell.Surfaces.end(), triangle.SourceSurfaceIndex) == cell.Surfaces.end())
+							cell.Surfaces.push_back(triangle.SourceSurfaceIndex);
+					}
 				}
 			}
 		}
+		m_AccelerationStats.OccupiedCells = static_cast<uint32_t>(m_SpatialGrid.size());
 
 		FT_CORE_INFO(
-			"Built static collision grid for '{0}': {1} triangles, {2} occupied cells.",
+			"Built static world grid for '{0}': {1} surfaces, {2} collision triangles, {3} occupied cells.",
 			m_SourceName,
+			m_Surfaces.size(),
 			m_CollisionTriangles.size(),
-			m_CollisionGrid.size()
+			m_SpatialGrid.size()
 		);
 	}
 
-	void StaticWorld::QueryCollisionGrid(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates, CollisionQueryStats* stats) const
+	void StaticWorld::QueryCollisionTriangles(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates, CollisionQueryStats* stats) const
 	{
 		candidates.clear();
-		if (!bounds.IsValid || m_CollisionGrid.empty())
+		if (!bounds.IsValid || m_SpatialGrid.empty())
 			return;
 
 		if (stats)
@@ -307,19 +320,19 @@ namespace FuturaLibrary
 		}
 
 		uint32_t candidateSurfaces = 0;
-		const GridCoord minCoord = ToGridCoord(bounds.Min, m_CollisionGridCellSize);
-		const GridCoord maxCoord = ToGridCoord(bounds.Max, m_CollisionGridCellSize);
+		const GridCoord minCoord = ToGridCoord(bounds.Min, m_SpatialGridCellSize);
+		const GridCoord maxCoord = ToGridCoord(bounds.Max, m_SpatialGridCellSize);
 		for (int32_t z = minCoord.Z; z <= maxCoord.Z; z++)
 		{
 			for (int32_t y = minCoord.Y; y <= maxCoord.Y; y++)
 			{
 				for (int32_t x = minCoord.X; x <= maxCoord.X; x++)
 				{
-					const auto cell = m_CollisionGrid.find(HashGridCoord({ x, y, z }));
-					if (cell == m_CollisionGrid.end())
+					const auto cell = m_SpatialGrid.find(HashGridCoord({ x, y, z }));
+					if (cell == m_SpatialGrid.end())
 						continue;
 
-					for (uint32_t triangleIndex : cell->second)
+					for (uint32_t triangleIndex : cell->second.CollisionTriangles)
 					{
 						if (triangleIndex >= m_CollisionQueryMarks.size() ||
 							m_CollisionQueryMarks[triangleIndex] == m_CollisionQueryStamp)
@@ -349,6 +362,46 @@ namespace FuturaLibrary
 		}
 	}
 
+	void StaticWorld::QuerySurfaces(const AxisAlignedBounds& bounds, std::vector<uint32_t>& candidates) const
+	{
+		candidates.clear();
+		if (!bounds.IsValid || m_SpatialGrid.empty())
+			return;
+
+		if (m_SurfaceQueryStamp == 0)
+		{
+			std::fill(m_SurfaceQueryMarks.begin(), m_SurfaceQueryMarks.end(), 0);
+			m_SurfaceQueryStamp = 1;
+		}
+
+		const GridCoord minCoord = ToGridCoord(bounds.Min, m_SpatialGridCellSize);
+		const GridCoord maxCoord = ToGridCoord(bounds.Max, m_SpatialGridCellSize);
+		for (int32_t z = minCoord.Z; z <= maxCoord.Z; z++)
+		{
+			for (int32_t y = minCoord.Y; y <= maxCoord.Y; y++)
+			{
+				for (int32_t x = minCoord.X; x <= maxCoord.X; x++)
+				{
+					const auto cell = m_SpatialGrid.find(HashGridCoord({ x, y, z }));
+					if (cell == m_SpatialGrid.end())
+						continue;
+
+					for (uint32_t surfaceIndex : cell->second.Surfaces)
+					{
+						if (surfaceIndex >= m_SurfaceQueryMarks.size() ||
+							m_SurfaceQueryMarks[surfaceIndex] == m_SurfaceQueryStamp)
+							continue;
+
+						m_SurfaceQueryMarks[surfaceIndex] = m_SurfaceQueryStamp;
+						candidates.push_back(surfaceIndex);
+					}
+				}
+			}
+		}
+
+		m_SurfaceQueryStamp++;
+	}
+
 	WorldRaycastHit StaticWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance) const
 	{
 		WorldRaycastHit closestHit;
@@ -360,7 +413,7 @@ namespace FuturaLibrary
 		rayBounds.Min = glm::min(origin, origin + rayDirection * maxDistance);
 		rayBounds.Max = glm::max(origin, origin + rayDirection * maxDistance);
 		rayBounds.IsValid = true;
-		QueryCollisionGrid(rayBounds, m_CollisionQueryCandidates);
+		QueryCollisionTriangles(rayBounds, m_CollisionQueryCandidates);
 
 		float closestDistance = maxDistance;
 		for (uint32_t triangleIndex : m_CollisionQueryCandidates)
@@ -395,7 +448,7 @@ namespace FuturaLibrary
 
 			const glm::vec3 candidateCenter = resolvedCenter + axisDelta;
 			const AxisAlignedBounds candidateBounds = MakeAABB(candidateCenter, halfExtents);
-			QueryCollisionGrid(candidateBounds, m_CollisionQueryCandidates, stats);
+			QueryCollisionTriangles(candidateBounds, m_CollisionQueryCandidates, stats);
 			if (AABBOverlapsAnyTriangleBounds(candidateBounds, m_CollisionTriangles, m_CollisionQueryCandidates, stats))
 				continue;
 
